@@ -6,7 +6,30 @@
 
 “Positive” and “negative” sentiment often miss the useful question: *what makes a product difficult to adopt, and what could a team test next?* SENTIENT connects customer language to cautious behavioral hypotheses, exact evidence, and measurable experiment ideas.
 
-This is an **independent portfolio project** by Pahul Sachdeva, combining a neuroscience background with customer research and growth interests. The included organizations and conversations are **fictional**. There is no employer data, endorsement, or reported experimental uplift.
+## The question behind the project
+
+I'm Pahul Sachdeva. I work in **AI Enablement and Customer Sentiment at EliseAI**, and I studied neuroscience at Colgate University. My work has made me curious about how we define customer success when the product itself changes the way people work.
+
+I'm exploring what useful metrics for customer success and customer education could look like: how customers describe their experience, what they understand after training, whether they can complete a workflow independently, and whether that learning becomes sustained product use. A rating can start the conversation; the explanation behind it helps identify what to investigate next.
+
+SENTIENT is my independent space to build on those questions. It connects customer feedback, behavioral research, and experiment design so I can explore how education and enablement might support adoption—and how a team could measure that change.
+
+### What I want to measure
+
+These are **proposed measurement questions for this project**, rather than a description of EliseAI's internal scorecards. The current demo surfaces conversation evidence and experiment ideas; it does not calculate the measures below.
+
+| Dimension | Question I'm exploring | Candidate measure for a future study |
+|---|---|---|
+| Customer experience | What is driving the customer's rating? | Rating paired with a coded explanation and supporting excerpt |
+| Learning | Does the customer understand the workflow after education? | Scenario-based knowledge check before and after training |
+| Independent use | Can the customer complete the task without help? | Successful task completion without assistance |
+| Activation | How quickly does the customer reach a useful first outcome? | Time to first successful workflow |
+| Sustained adoption | Does the workflow become part of regular work? | Repeat successful use over a defined follow-up period |
+| Education effectiveness | Does a specific educational change improve an outcome? | Difference in task success or activation between randomized groups |
+
+My goal is to connect what customers say with what they can do, then design a test that helps explain whether a change made a difference. That is also the connection I want to build between behavioral science, customer education, and growth.
+
+All included organizations and conversations are **fictional**. This is an independent portfolio project, with no employer data or endorsement. No experimental uplift is reported.
 
 ## Explore the workflow
 
