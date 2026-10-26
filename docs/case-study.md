@@ -1,5 +1,17 @@
-# Case study: from a sentence to an experiment
+# Helping Maya reach her first useful study session
 
-In a fictional onboarding interview, a leasing manager describes a six-screen setup guide and uncertainty about which step mattered first. SENTIENT retains that sentence as source evidence and offers *cognitive effort* and *uncertainty* as candidate labels. A process or staffing issue could also explain the friction. A later fictional check-in says a shorter checklist helped, while handoff guidance remains unclear. This sequence raises research questions; it does not prove a checklist caused adoption.
+Maya is a student using a consumer AI assistant to prepare for an exam. She wants the assistant to turn her notes into a quiz. In her first interview, she describes a six-screen setup guide and says she wasn't sure which step mattered first. She leaves without trying the quiz.
 
-The experiment studio proposes a three-step checklist, with seven-day setup completion as the primary outcome. A growth team could randomize eligible accounts and inspect completion and support contacts. No such test has been run. The product's value is in connecting customer language to a falsifiable growth decision while keeping the evidentiary boundary visible.
+## What to investigate
+
+The source sentence suggests two reasonable questions: does setup require too much effort, and is the next step unclear? It's also possible the introduction doesn't fit Maya's study task. A follow-up question would ask what she expected to see after opening the product.
+
+## The change to try
+
+Let new users choose a study goal and paste their notes directly into a starter prompt. Show a short example of the quiz they'll get, then let them try it.
+
+## How I'd test it
+
+Randomly assign eligible new study users to the current introduction or the starter prompt. Define first quiz completion before starting. Measure the difference between groups, along with time to completion, errors, and repeat study use within seven days. Check whether users understand when answers need verification.
+
+Maya's later interview says a starter example helped her create a quiz, but she still checks answers against her course notes. That gives the next round of research a direction: guidance about verification. The interview sequence is a useful lead; the randomized test would tell us whether the change improved the outcome.

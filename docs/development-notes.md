@@ -5,7 +5,7 @@
 - `apps/web/analysis.js` contains the behavioral categories, cue rules, evidence extraction, experiment templates, and import validation. This is the place to review the analytical assumptions.
 - `apps/web/app.js` owns browser state and the six views. `filtered()` applies search and sort before pagination. The conversation drawer keeps the source text beside the interpretations.
 - `apps/web/style.css` defines the black and purple palette and responsive layouts. `assets/mark.svg` and `assets/header.svg` share a looping brain motif based on the supplied visual reference.
-- `data/synthetic/conversations.json` contains the authored fixture. Follow-up records use the same account name so the timeline can group them.
+- `data/synthetic/conversations.json` contains the authored fixture. Follow-up records use the same person identifier so the timeline can group them.
 
 ## Decisions behind the MVP
 
@@ -17,7 +17,7 @@
 
 **Keep the source and the interpretation together.** The excerpt is retained with offsets. Reviewers should be able to disagree with a label while seeing exactly what triggered it.
 
-**Separate imports from the fixture.** Browser imports can be cleared without changing the synthetic workspace. Imported text is escaped when rendered and revalidated when loaded from storage.
+**Separate imports from the fixture.** Browser imports can be cleared without changing the example workspace. Imported text is escaped when rendered and revalidated when loaded from storage.
 
 **Keep metrics proposals explicit.** The README's learning, independent-use, activation, and adoption measures are research directions. The app does not yet join conversations to product usage or training outcomes.
 

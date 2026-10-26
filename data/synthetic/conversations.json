@@ -1,14 +1,110 @@
 [
-  {"id":"C-001","account":"Northstar Living","role":"Leasing manager","date":"2026-01-12","channel":"Interview","stage":"Onboarding","text":"The setup guide had six screens. I wasn't sure which step mattered first, so I left it until the next day. Once someone walked me through it, I could finish."},
-  {"id":"C-002","account":"Harbor & Pine","role":"Operations lead","date":"2026-01-18","channel":"Interview","stage":"Evaluation","text":"We like the idea, but I need to know who approves the replies before we turn it on. If we can review them first, I'd feel better about a pilot."},
-  {"id":"C-003","account":"Cedar House","role":"Site manager","date":"2026-01-23","channel":"Support","stage":"Onboarding","text":"I thought the dashboard would show every inquiry instantly. It takes a little while to sync, and nobody explained that. The delay made me think it was broken."},
-  {"id":"C-004","account":"Juniper Group","role":"Marketing director","date":"2026-02-04","channel":"Interview","stage":"Activation","text":"The team already has a morning routine in our old system. Asking them to open another tab means one more thing to remember. A daily digest might fit better."},
-  {"id":"C-005","account":"Northstar Living","role":"Leasing manager","date":"2026-02-09","channel":"Check-in","stage":"Activation","text":"The short checklist helped. I know what to do first now, but I'm still unsure when to hand a conversation to a person."},
-  {"id":"C-006","account":"Harbor & Pine","role":"Operations lead","date":"2026-02-16","channel":"Check-in","stage":"Pilot","text":"We tried the review queue. Seeing the draft before it goes out helps me trust the workflow, although approval takes time when we're busy."},
-  {"id":"C-007","account":"Cedar House","role":"Site manager","date":"2026-02-21","channel":"Check-in","stage":"Activation","text":"The sync status label makes the delay clear. I don't wonder if it's broken anymore. I'd still like a notification when a record is ready."},
-  {"id":"C-008","account":"Westmere","role":"Customer success lead","date":"2026-03-03","channel":"Interview","stage":"Evaluation","text":"I would need to see a real example before recommending it to our teams. The overview sounds promising, but I'm uncertain how it handles unusual requests."},
-  {"id":"C-009","account":"Juniper Group","role":"Marketing director","date":"2026-03-07","channel":"Check-in","stage":"Pilot","text":"The daily digest fits our routine better than another dashboard. Two team members are using it, though I can't say whether it changed response time yet."},
-  {"id":"C-010","account":"Northstar Living","role":"Leasing manager","date":"2026-03-14","channel":"Check-in","stage":"Pilot","text":"The handoff examples helped us decide when to step in. Our team uses the queue most days now, but we still review edge cases together."},
-  {"id":"C-011","account":"Westmere","role":"Customer success lead","date":"2026-03-18","channel":"Check-in","stage":"Onboarding","text":"The example library answered some questions. I still want a way to test an unusual request safely before enabling the feature."},
-  {"id":"C-012","account":"Harbor & Pine","role":"Operations lead","date":"2026-03-24","channel":"Check-in","stage":"Pilot","text":"We trust the drafts more after reviewing them for a month. The approval queue is still slow on busy days, so we'd like a faster way to handle routine cases."}
+  {
+    "id": "C-001",
+    "account": "Maya",
+    "role": "University student",
+    "date": "2026-01-12",
+    "channel": "User interview",
+    "stage": "First session",
+    "text": "I opened the chat to study for an exam, but the setup guide had six screens. I wasn't sure which step mattered first. I wanted it to quiz me on my notes, but I left without trying."
+  },
+  {
+    "id": "C-002",
+    "account": "Jordan",
+    "role": "Job seeker",
+    "date": "2026-01-18",
+    "channel": "User interview",
+    "stage": "First session",
+    "text": "I asked it to rewrite my cover letter. The result sounded polished, but it didn't sound like me. I want to review the draft before replacing what I wrote, and keep my original version."
+  },
+  {
+    "id": "C-003",
+    "account": "Alex",
+    "role": "Personal writing",
+    "date": "2026-01-23",
+    "channel": "User interview",
+    "stage": "Returning",
+    "text": "I thought my writing chats would be saved instantly. I switched to my phone and couldn't find the last reply. The delay made me think it was broken."
+  },
+  {
+    "id": "C-004",
+    "account": "Sam",
+    "role": "Daily planning",
+    "date": "2026-02-04",
+    "channel": "User interview",
+    "stage": "First session",
+    "text": "I already have a morning routine in my notes app. Opening another tab is one more thing to remember. A daily digest with my unfinished tasks might give me a reason to come back."
+  },
+  {
+    "id": "C-005",
+    "account": "Maya",
+    "role": "University student",
+    "date": "2026-02-09",
+    "channel": "Follow-up",
+    "stage": "Returning",
+    "text": "The starter example helped me turn my notes into a quiz. I know what to do first now, but I'm still unsure how to check whether an answer is right."
+  },
+  {
+    "id": "C-006",
+    "account": "Jordan",
+    "role": "Job seeker",
+    "date": "2026-02-16",
+    "channel": "Follow-up",
+    "stage": "Returning",
+    "text": "Seeing the draft beside my original letter helps me compare them. I still change the opening because the suggestions make my experience sound more senior than it is."
+  },
+  {
+    "id": "C-007",
+    "account": "Alex",
+    "role": "Personal writing",
+    "date": "2026-02-21",
+    "channel": "Follow-up",
+    "stage": "Returning",
+    "text": "The sync status makes the delay clear. I found the chat on my phone this time. I wish there were a quicker way to pick up the same writing session."
+  },
+  {
+    "id": "C-008",
+    "account": "Riley",
+    "role": "Learning to code",
+    "date": "2026-03-03",
+    "channel": "User interview",
+    "stage": "First session",
+    "text": "I'm learning Python and I need a real example I can run. I'm uncertain whether the explanation matches the code. When it gives me a long answer I don't know where to start."
+  },
+  {
+    "id": "C-009",
+    "account": "Sam",
+    "role": "Daily planning",
+    "date": "2026-03-07",
+    "channel": "Follow-up",
+    "stage": "Returning",
+    "text": "The daily digest fits my routine better. My partner and I plan dinner together. I opened it three mornings this week. I still use my notes app for the grocery list."
+  },
+  {
+    "id": "C-010",
+    "account": "Maya",
+    "role": "University student",
+    "date": "2026-03-14",
+    "channel": "Follow-up",
+    "stage": "Returning",
+    "text": "I used the quiz twice this week. It helps me spot topics I need to revise, but I still check the answers against my course notes before learning them."
+  },
+  {
+    "id": "C-011",
+    "account": "Riley",
+    "role": "Learning to code",
+    "date": "2026-03-18",
+    "channel": "Follow-up",
+    "stage": "Returning",
+    "text": "The runnable example was easier to follow. I want a way to test the code safely before I paste it into my own project. I don't always understand the error messages."
+  },
+  {
+    "id": "C-012",
+    "account": "Jordan",
+    "role": "Job seeker",
+    "date": "2026-03-24",
+    "channel": "Follow-up",
+    "stage": "Considering paid",
+    "text": "I trust the drafts more when I can see the edits. I used it for another application, but I would need to see a real example of the paid features before subscribing."
+  }
 ]

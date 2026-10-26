@@ -1,52 +1,79 @@
 <p align="center"><img src="assets/header.svg" alt="Sentient — AI Enablement Marketer" width="100%"></p>
 
-<p align="center"><strong>A project by Pahul Sachdeva · Behavioral science × customer education × growth</strong></p>
+<p align="center">A project by Pahul Sachdeva · Customer understanding, education, and adoption</p>
 
-## Why this exists
+## Why I'm building this
 
-“Positive” and “negative” sentiment often miss the useful question: *what makes a product difficult to adopt, and what could a team test next?* SENTIENT connects customer language to cautious behavioral hypotheses, exact evidence, and measurable experiment ideas.
+I work in AI Enablement and Customer Sentiment at EliseAI, and I studied neuroscience at Colgate. One question I keep coming back to is what we should measure when we're trying to help someone get comfortable with AI.
 
-## The question behind the project
+A customer can give a product a good rating and still struggle to use it. Someone else might sound frustrated but keep coming back because it solves a problem they care about. I want to understand what sits behind those reactions, and how customer education could help.
 
-I'm Pahul Sachdeva. I work in **AI Enablement and Customer Sentiment at EliseAI**, and I studied neuroscience at Colgate University. My work has made me curious about how we define customer success when the product itself changes the way people work.
+Sentient is where I'm working through that idea: taking a conversation, finding the part worth following up on, and turning it into something we could test.
 
-I'm exploring what useful metrics for customer success and customer education could look like: how customers describe their experience, what they understand after training, whether they can complete a workflow independently, and whether that learning becomes sustained product use. A rating can start the conversation; the explanation behind it helps identify what to investigate next.
+## The example I'm using
 
-SENTIENT is my independent space to build on those questions. It connects customer feedback, behavioral research, and experiment design so I can explore how education and enablement might support adoption—and how a team could measure that change.
+To test this idea without using any of my company's internal examples, I built a set of fictional user interviews. For this project, I'm treating the product as a **B2C SaaS AI assistant**, rather than the B2B setting I work in at EliseAI.
 
-### What I want to measure
+Think of a subscription chatbot people use to study, write, plan their day, or learn to code. The product question is simple: **what helps someone get a useful first result, trust it appropriately, and find a reason to return?**
 
-These are **proposed measurement questions for this project**, rather than a description of EliseAI's internal scorecards. The current demo surfaces conversation evidence and experiment ideas; it does not calculate the measures below.
+The workspace follows five people across 12 conversations:
 
-| Dimension | Question I'm exploring | Candidate measure for a future study |
+| Person | What they're trying to do | What gets in the way |
 |---|---|---|
-| Customer experience | What is driving the customer's rating? | Rating paired with a coded explanation and supporting excerpt |
-| Learning | Does the customer understand the workflow after education? | Scenario-based knowledge check before and after training |
-| Independent use | Can the customer complete the task without help? | Successful task completion without assistance |
-| Activation | How quickly does the customer reach a useful first outcome? | Time to first successful workflow |
-| Sustained adoption | Does the workflow become part of regular work? | Repeat successful use over a defined follow-up period |
-| Education effectiveness | Does a specific educational change improve an outcome? | Difference in task success or activation between randomized groups |
+| Maya | Study with quizzes made from her notes | Getting started and knowing when to check an answer |
+| Jordan | Write cover letters that still sound like them | Keeping control of edits and understanding the paid offering |
+| Alex | Continue writing across a laptop and phone | Finding saved chats and understanding sync timing |
+| Sam | Fit an AI assistant into daily planning | Remembering to return and fitting an existing routine |
+| Riley | Learn Python with examples they can run | Following explanations and testing code safely |
 
-My goal is to connect what customers say with what they can do, then design a test that helps explain whether a change made a difference. That is also the connection I want to build between behavioral science, customer education, and growth.
+## One example, from feedback to a test
 
-All included organizations and conversations are **fictional**. This is an independent portfolio project, with no employer data or endorsement. No experimental uplift is reported.
+Maya opens the assistant to study for an exam. She wants a quiz, but the onboarding takes her through six screens and she leaves before trying it.
 
-## Explore the workflow
+That raises a question: is the problem that the product asks her to do too much before she gets a useful result, or that it hasn't shown her how to start?
 
-| Step | What you can do | Why it matters |
-|---|---|---|
-| 1. Listen | Search, filter, sort, and inspect 12 fictional conversations across five accounts; import JSON locally. | Preserve the customer's own words. |
-| 2. Interpret | Examine six cue-based candidate constructs, exact source sentences, alternative explanations, and abstentions. | Make interpretations reviewable. |
-| 3. See change | Explore dated follow-ups per fictional account. | Identify questions about evolving experience without assuming causality. |
-| 4. Test | Inspect interventions with a hypothesis, primary outcome, and suggested design. | Connect research to activation, onboarding, and adoption decisions. |
+Sentient keeps her original words beside those possible explanations. From there, I can propose a small test: give new study users a starter prompt that turns their notes into a short quiz, then compare how many complete their first quiz.
 
-**Example:** a fictional manager says a six-screen setup guide left them unsure where to start. The app surfaces *cognitive effort* and *uncertainty* as possible interpretations and links back to the actual sentence. It proposes testing a shorter checklist against seven-day setup completion. It does **not** claim the checklist works. [Read the case study](docs/case-study.md).
+The main outcome would be **first quiz completion**. I'd also look at whether people return to study again and whether they understand the need to verify answers. That connects an education decision to both activation and responsible use.
 
-> **Release status:** The source code is public on GitHub. A live application deployment and actual product screenshots are still pending. No unverified link or screenshot is presented as a finished demo.
+[Walk through the case study →](docs/case-study.md)
 
-## Run it
+## What you can do
 
-Requires Node.js 20 or later. There are no packages to install and no API keys.
+- Search the interviews, filter by stage, and read the full conversation.
+- Inspect the sentence behind a behavioral interpretation and consider another explanation.
+- Follow the same person over time to see how their experience changes.
+- Explore experiment ideas with an intervention, outcome, and suggested test design.
+- Import a JSON file to try the workflow with your own examples.
+
+## What I'd measure
+
+I'm interested in how customer feedback connects to learning and actual use. These are the measures I'd explore for the consumer assistant:
+
+| Question | Measure I'd start with |
+|---|---|
+| Did someone get value in their first visit? | Completion of a useful task, such as a quiz or revised draft |
+| Did the guidance help them understand what to do? | Task success before and after guidance, plus a short understanding check |
+| Can they do it themselves next time? | Successful task completion without assistance |
+| Do they have a reason to return? | Repeat successful use within a defined follow-up period |
+| Do they know when to verify the output? | Recognition of cases where an answer needs checking |
+| Is the paid offering clear? | Understanding of the paid features, followed by trial-to-paid conversion |
+
+The interviews help choose a question. Product events and a well-designed experiment would be needed to measure the outcome.
+
+## How it works
+
+The current analysis uses a small set of readable phrase rules. They look for language about effort, uncertainty, control, trust, routines, and expectations. Each match keeps the source sentence and an alternative explanation so a reviewer can decide whether the interpretation makes sense.
+
+I started with rules because I want to understand and inspect the behavior before adding a model. An optional LLM integration is on the roadmap. The next step is to evaluate the approach against independently reviewed examples, including ones where it should say there isn't enough evidence.
+
+The app runs in the browser, with a small Node server for local development. Imports stay in that browser's storage and can be cleared from Research Workspace.
+
+[Development notes](docs/development-notes.md) · [Architecture](docs/architecture.md) · [Methodology](docs/methodology.md) · [Evaluation](docs/evaluation.md)
+
+## Run locally
+
+Use Node.js 20 or later. No dependency installation or API key is needed.
 
 ```bash
 npm start
@@ -58,46 +85,14 @@ npm run check
 npm test
 ```
 
-JSON import expects an array of records with `id`, `account`, `role`, `date` (`YYYY-MM-DD`), and `text`; `channel` and `stage` are optional. Import replaces the previous local import and is saved only in that browser's local storage. Try a record such as:
+To import examples, use an array with `id`, `account` (the person's name or ID), `role` (their use case), `date`, and `text`. `channel` and `stage` are optional.
 
 ```json
-[{"id":"I-001","account":"Fictional Co","role":"Manager","date":"2026-04-01","text":"I wasn't sure which step mattered first."}]
+[{"id":"I-001","account":"Taylor","role":"Study help","date":"2026-04-01","text":"I wasn't sure which step mattered first."}]
 ```
 
-## Product and architecture
+## Where I'm taking it next
 
-The current release is a dependency-free web application with a small Node static server and browser-side JavaScript. It runs the same transparent phrase rules on the included data and on imported records. Every finding holds an excerpt with source offsets, a candidate interpretation, an alternative, and a human review status. Counts represent records with matching cues, not population prevalence. Experiment templates are hypotheses, not model-generated discoveries.
+The next pieces are a hosted demo, better handling of paraphrases and negation, and a way to save reviewer decisions. I'd also like to connect the interview view to task and retention events so I can work through the measurement questions above.
 
-```mermaid
-flowchart LR
-  A["Fictional records or local JSON"] --> B["Cue rules and excerpts"]
-  B --> C["Reviewable insights"]
-  C --> D["Test proposals"]
-```
-
-See [development notes](docs/development-notes.md), [architecture](docs/architecture.md), [product brief](docs/product-brief.md), and [roadmap](docs/roadmap.md). A structured-output LLM adapter is planned, but **this MVP does not call an LLM**. The honest deterministic mode keeps the public experience free and auditable.
-
-## Research, evaluation, and responsibility
-
-The methodology draws questions from technology acceptance and behavior change research, while treating this project's rules as unvalidated heuristics. A phrase match is not a psychological diagnosis, statistical confidence score, or causal finding. Records with no cues yield insufficient evidence. Human review and a labeled benchmark are required before applying the approach to real research. See [methodology and literature](docs/methodology.md), [evaluation](docs/evaluation.md), and [privacy](docs/privacy.md).
-
-The automated suite checks exact evidence spans, abstention on unsupported language, count semantics, untested experiment wording, and import validation. It does not establish scientific accuracy. The demo dataset was authored to illustrate the workflow; there is no measured lift, customer sample, or model accuracy result.
-
-## Project map
-
-```text
-apps/web/           Interface, analysis rules, and local server
-data/synthetic/     Fictional conversation dataset
-docs/               Brief, case study, methods, architecture, evaluation, privacy, roadmap
-tests/              Node test suite
-assets/             Original wordmark and icon
-.github/workflows/  Syntax and test checks for future GitHub publication
-```
-
-## Next
-
-1. Deploy the application and capture verified screenshots from the running app.
-2. Conduct a usability review and create a human-annotated, consented evaluation set.
-3. Add an optional schema-validated LLM pipeline with excerpt verification, abstention, and reviewer controls.
-
-MIT licensed. Contributions should follow [CONTRIBUTING.md](CONTRIBUTING.md).
+[Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
