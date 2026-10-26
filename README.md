@@ -42,7 +42,7 @@ All included organizations and conversations are **fictional**. This is an indep
 
 **Example:** a fictional manager says a six-screen setup guide left them unsure where to start. The app surfaces *cognitive effort* and *uncertainty* as possible interpretations and links back to the actual sentence. It proposes testing a shorter checklist against seven-day setup completion. It does **not** claim the checklist works. [Read the case study](docs/case-study.md).
 
-> **Release status:** The application and tests are built and stored in this private GitHub draft. Public publication, a live deployment, and actual product screenshots are pending. No unverified link or screenshot is presented as a finished demo.
+> **Release status:** The source code is public on GitHub. A live application deployment and actual product screenshots are still pending. No unverified link or screenshot is presented as a finished demo.
 
 ## Run it
 
@@ -96,7 +96,7 @@ assets/             Original wordmark and icon
 
 ## Next
 
-1. Publish the repository and capture verified screenshots from the running app.
+1. Deploy the application and capture verified screenshots from the running app.
 2. Conduct a usability review and create a human-annotated, consented evaluation set.
 3. Add an optional schema-validated LLM pipeline with excerpt verification, abstention, and reviewer controls.
 
