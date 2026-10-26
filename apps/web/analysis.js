@@ -4,12 +4,12 @@
  * excerpt + hypothesis + alternative contract and be evaluated separately.
  */
 export const constructs = [
-  { id: 'effort', label: 'Cognitive effort', color: '#b99aff', cues: [/six screens/i, /which step/i, /checklist/i, /another tab/i, /one more thing/i, /takes time/i, /slow on busy/i], description: 'Reported steps or attention required to use a workflow.', alternative: 'A process or staffing constraint may explain the friction.' },
+  { id: 'effort', label: 'Cognitive effort', color: '#b99aff', cues: [/six screens/i, /which step/i, /checklist/i, /another tab/i, /one more thing/i, /takes time/i, /slow on busy/i], description: 'Reported steps or attention required to use a workflow.', alternative: 'Available time or the choice of task may explain the friction.' },
   { id: 'uncertainty', label: 'Uncertainty', color: '#e6ad7b', cues: [/wasn't sure/i, /unsure/i, /uncertain/i, /wonder if/i, /need to know/i, /unusual request/i, /edge cases/i], description: 'A stated information gap about what will happen or what to do.', alternative: 'The customer may need specific documentation rather than a new product flow.' },
-  { id: 'control', label: 'Perceived control', color: '#84c8bd', cues: [/approves? the replies/i, /review them first/i, /review queue/i, /draft before/i, /handoff/i, /step in/i, /test .* safely/i, /approval queue/i], description: 'A stated desire to review, intervene, or control the process.', alternative: 'Approval requirements may come from organizational policy.' },
-  { id: 'trust', label: 'Trust calibration', color: '#a0aef9', cues: [/trust the workflow/i, /trust the drafts/i, /think it was broken/i, /real example/i, /seeing the draft/i, /safely/i], description: 'A reported signal of confidence or concern about reliability.', alternative: 'The concern may reflect a specific defect or lack of product information.' },
-  { id: 'habit', label: 'Existing routine', color: '#cf9bc9', cues: [/morning routine/i, /daily digest/i, /fits our routine/i, /most days/i, /another dashboard/i], description: 'A stated relationship between usage and an established routine.', alternative: 'The format preference may be driven by workload or channel access.' },
-  { id: 'expectation', label: 'Expectation gap', color: '#a4c595', cues: [/thought the dashboard/i, /instantly/i, /nobody explained/i, /delay/i, /sync status/i], description: 'A reported mismatch between expected and observed behavior.', alternative: 'A temporary sync issue may account for the experience.' }
+  { id: 'control', label: 'Perceived control', color: '#84c8bd', cues: [/keep my original/i, /review the draft/i, /compare them/i, /draft before/i, /see the edits/i, /step in/i, /test .* safely/i, /paid features/i], description: 'A stated desire to review, intervene, or control the process.', alternative: 'The user may prefer a different writing style or need clearer editing controls.' },
+  { id: 'trust', label: 'Trust calibration', color: '#a0aef9', cues: [/verify answers/i, /trust the drafts/i, /think it was broken/i, /real example/i, /seeing the draft/i, /safely/i], description: 'A reported signal of confidence or concern about reliability.', alternative: 'The concern may reflect a specific defect or lack of product information.' },
+  { id: 'habit', label: 'Existing routine', color: '#cf9bc9', cues: [/morning routine/i, /daily digest/i, /fits (?:my|our) routine/i, /most days/i, /another dashboard/i], description: 'A stated relationship between usage and an established routine.', alternative: 'The format preference may be driven by workload or channel access.' },
+  { id: 'expectation', label: 'Expectation gap', color: '#a4c595', cues: [/thought my writing chats/i, /instantly/i, /nobody explained/i, /delay/i, /sync status/i], description: 'A reported mismatch between expected and observed behavior.', alternative: 'A temporary sync issue may account for the experience.' }
 ];
 
 /** A record contributes at most one finding per construct. No cue means abstention. */
@@ -42,12 +42,42 @@ export function summarize(records) {
 
 // Templates make the proposed intervention auditable. These are not observed outcomes.
 export const experimentTemplates = {
-  effort: { title: 'Shorter activation path', intervention: 'Offer a three-step setup checklist to new users.', outcome: 'Setup completion within seven days', design: 'Randomize eligible new accounts to current onboarding or checklist; compare completion rates.' },
-  uncertainty: { title: 'Just-in-time guidance', intervention: 'Show contextual examples at the decision point.', outcome: 'First successful workflow completion', design: 'Randomize eligible users to current guidance or examples; measure completion and support contacts.' },
-  control: { title: 'Review-first onboarding', intervention: 'Let teams approve initial drafts before enabling automation.', outcome: 'Pilot activation rate', design: 'Assign comparable new accounts to standard setup or review-first flow; monitor activation and time cost.' },
-  trust: { title: 'Transparent preview', intervention: 'Show a sample output and explain the review and escalation controls.', outcome: 'Qualified trial activation', design: 'Randomize onboarding visitors to current or preview experience; track activation and reported confidence separately.' },
-  habit: { title: 'Routine-aligned delivery', intervention: 'Offer a daily digest alongside the dashboard.', outcome: 'Weekly active usage', design: 'Randomize pilot teams to dashboard-only or dashboard plus digest; track usage and notification fatigue.' },
-  expectation: { title: 'Visible sync state', intervention: 'Show sync timing and a clear ready notification.', outcome: 'Support contacts about missing records', design: 'Roll out to randomized eligible accounts; compare support contacts and record engagement.' }
+  effort: {
+    title: 'Get to the first quiz sooner',
+    intervention: 'Let study users paste notes into a starter prompt before completing optional setup.',
+    outcome: 'First quiz completion',
+    design: 'Randomize new study users to the current introduction or starter prompt. Compare quiz completion, time to completion, and seven-day repeat use.'
+  },
+  uncertainty: {
+    title: 'Show what a useful prompt looks like',
+    intervention: 'Offer a worked example for the goal the person chooses: studying, writing, planning, or coding.',
+    outcome: 'First successful task completion',
+    design: 'Randomize new users to the current empty chat or a relevant example. Track task completion and requests for help.'
+  },
+  control: {
+    title: 'Keep the original beside the rewrite',
+    intervention: 'Show suggested edits beside the original and let the user accept changes individually.',
+    outcome: 'Completed writing task',
+    design: 'Randomize eligible writing sessions to a replacement draft or side-by-side edits. Compare completion, undo actions, and reported control.'
+  },
+  trust: {
+    title: 'Make verification part of the task',
+    intervention: 'Explain when to check an answer and show a practical verification step beside study or coding output.',
+    outcome: 'Successful task completion with appropriate verification',
+    design: 'Randomize eligible users to current guidance or verification guidance. Assess task accuracy and whether users recognize answers that need checking.'
+  },
+  habit: {
+    title: 'Give planning users a reason to return',
+    intervention: 'Offer an opt-in morning recap of unfinished plans with a link back to the conversation.',
+    outcome: 'Repeat successful planning use within seven days',
+    design: 'Randomize consenting planning users to the current experience or morning recap. Track return use, task completion, and notification opt-outs.'
+  },
+  expectation: {
+    title: 'Make saved chats easier to find',
+    intervention: 'Show chat save and sync status, with a clear way to resume a session on another device.',
+    outcome: 'Successful cross-device conversation resume',
+    design: 'Randomize eligible cross-device users to the current history view or resume prompt. Track resumed sessions and missing-chat support contacts.'
+  }
 };
 
 export function recommendations(records) {
