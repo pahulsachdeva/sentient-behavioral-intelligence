@@ -1,3 +1,8 @@
+/**
+ * Exploratory baseline, not a psychological measurement instrument.
+ * Keep cue rules inspectable: a future model adapter must preserve the same
+ * excerpt + hypothesis + alternative contract and be evaluated separately.
+ */
 export const constructs = [
   { id: 'effort', label: 'Cognitive effort', color: '#b99aff', cues: [/six screens/i, /which step/i, /checklist/i, /another tab/i, /one more thing/i, /takes time/i, /slow on busy/i], description: 'Reported steps or attention required to use a workflow.', alternative: 'A process or staffing constraint may explain the friction.' },
   { id: 'uncertainty', label: 'Uncertainty', color: '#e6ad7b', cues: [/wasn't sure/i, /unsure/i, /uncertain/i, /wonder if/i, /need to know/i, /unusual request/i, /edge cases/i], description: 'A stated information gap about what will happen or what to do.', alternative: 'The customer may need specific documentation rather than a new product flow.' },
@@ -7,29 +12,35 @@ export const constructs = [
   { id: 'expectation', label: 'Expectation gap', color: '#a4c595', cues: [/thought the dashboard/i, /instantly/i, /nobody explained/i, /delay/i, /sync status/i], description: 'A reported mismatch between expected and observed behavior.', alternative: 'A temporary sync issue may account for the experience.' }
 ];
 
+/** A record contributes at most one finding per construct. No cue means abstention. */
 export function analyze(record) {
   const text = String(record.text || '');
   return constructs.flatMap(construct => {
     const matches = construct.cues.flatMap(pattern => {
       const match = pattern.exec(text);
       if (!match) return [];
+      // Retain surrounding language so reviewers can challenge a match in context.
+      // TODO: replace period boundaries before supporting abbreviations and multilingual text.
       const start = Math.max(0, text.lastIndexOf('.', match.index - 1) + 1);
       const endIndex = text.indexOf('.', match.index + match[0].length);
       const end = endIndex === -1 ? text.length : endIndex + 1;
       return [{ excerpt: text.slice(start, end).trim(), start, end }];
     });
+    // Several rules may match the same sentence. Count that sentence once.
     const unique = [...new Map(matches.map(m => [m.excerpt, m])).values()];
     if (!unique.length) return [];
     return [{ id: `${record.id}-${construct.id}`, recordId: record.id, constructId: construct.id, label: construct.label, color: construct.color, excerpts: unique, hypothesis: `This conversation may indicate ${construct.label.toLowerCase()} as an adoption factor.`, alternative: construct.alternative, evidenceLevel: unique.length > 1 ? 'Multiple cues' : 'Single cue', status: 'Needs human review' }];
   });
 }
 
+// Counts are descriptive record counts; overlapping labels should never be summed as people.
 export function summarize(records) {
   const findings = records.flatMap(analyze);
   const counts = constructs.map(c => ({ ...c, count: findings.filter(f => f.constructId === c.id).length }));
   return { findings, counts, total: records.length, accounts: new Set(records.map(r => r.account)).size };
 }
 
+// Templates make the proposed intervention auditable. These are not observed outcomes.
 export const experimentTemplates = {
   effort: { title: 'Shorter activation path', intervention: 'Offer a three-step setup checklist to new users.', outcome: 'Setup completion within seven days', design: 'Randomize eligible new accounts to current onboarding or checklist; compare completion rates.' },
   uncertainty: { title: 'Just-in-time guidance', intervention: 'Show contextual examples at the decision point.', outcome: 'First successful workflow completion', design: 'Randomize eligible users to current guidance or examples; measure completion and support contacts.' },
@@ -44,6 +55,7 @@ export function recommendations(records) {
   return counts.filter(c => c.count).sort((a, b) => b.count - a.count).map(c => ({ ...c, ...experimentTemplates[c.id], evidence: findings.filter(f => f.constructId === c.id).slice(0, 3), hypothesis: `If ${c.label.toLowerCase()} is a barrier for this audience, the proposed change may improve the stated outcome. This remains untested.` }));
 }
 
+/** Bound input size for the browser demo and return only fields the app understands. */
 export function validateImport(value) {
   if (!Array.isArray(value) || value.length > 500) throw new Error('Import a JSON array of at most 500 conversations.');
   const ids = new Set();

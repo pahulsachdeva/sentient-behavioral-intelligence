@@ -1,6 +1,7 @@
 import { analyze, constructs, recommendations, summarize, validateImport } from './analysis.js';
 
 const app = document.getElementById('app');
+// Keep the authored fixture separate from imports so clearing browser data never removes the demo.
 let demo = [];
 let imported = [];
 let section = 'Overview';
@@ -13,6 +14,7 @@ let activeConstruct = 'all';
 let notice = '';
 const nav = ['Overview', 'Conversations', 'Behavioral Insights', 'Evidence Explorer', 'Experiments', 'Research Workspace'];
 const icons = { Overview: '◫', Conversations: '≡', 'Behavioral Insights': '◈', 'Evidence Explorer': '⌕', Experiments: '◇', 'Research Workspace': '▤' };
+// Source text is untrusted, including local imports. Escape it at the HTML rendering boundary.
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const all = () => [...demo, ...imported];
 const date = value => new Date(value + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -20,7 +22,7 @@ const chip = (label, color = '#a78bfa') => `<span class="chip" style="--chip:${c
 const sectionHeading = (eyebrow, title, description, action = '') => `<div class="heading"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p></div>${action}</div>`;
 const findRecord = id => all().find(r => r.id === id);
 function shell() {
-  app.innerHTML = `<div class="shell"><aside class="sidebar"><div class="brand"><img src="/assets/mark.svg" alt=""><div><strong>SENTIENT</strong><small>BEHAVIORAL INTELLIGENCE</small></div></div><div class="workspace-label">WORKSPACE <span class="workspace-tag">DEMO</span></div><nav aria-label="Main navigation">${nav.map(n => `<button class="nav-item ${section === n ? 'active' : ''}" data-nav="${n}"><span class="nav-icon">${icons[n]}</span>${n}</button>`).join('')}</nav><div class="sidebar-bottom"><div class="source-card"><span class="source-icon">✳</span><div><strong>Synthetic workspace</strong><span>Fictional records only</span></div></div><a class="sidebar-link" href="/docs/methodology.md" target="_blank">Methodology <span>↗</span></a></div></aside><div class="main"><header class="topbar"><div class="crumb">WORKSPACE <span>/</span> <b>${esc(section)}</b></div><div class="top-actions"><span class="demo-pill"><span class="live-dot"></span> PUBLIC DEMO</span><button class="avatar" title="Demo workspace" aria-label="Demo workspace">S</button></div></header><main id="content"></main><footer>Independent portfolio project · All example conversations are fictional · Interpretations require human review</footer></div></div><div id="drawer-root"></div><div id="toast-root" role="status" aria-live="polite"></div>`;
+  app.innerHTML = `<div class="shell"><aside class="sidebar"><div class="brand"><img src="/assets/mark.svg" alt=""><div><strong>Sentient</strong><small>AI ENABLEMENT MARKETER</small></div></div><div class="workspace-label">WORKSPACE <span class="workspace-tag">DEMO</span></div><nav aria-label="Main navigation">${nav.map(n => `<button class="nav-item ${section === n ? 'active' : ''}" data-nav="${n}"><span class="nav-icon">${icons[n]}</span>${n}</button>`).join('')}</nav><div class="sidebar-bottom"><div class="source-card"><span class="source-icon">✳</span><div><strong>Synthetic workspace</strong><span>Fictional records only</span></div></div><a class="sidebar-link" href="/docs/methodology.md" target="_blank">Methodology <span>↗</span></a></div></aside><div class="main"><header class="topbar"><div class="crumb">WORKSPACE <span>/</span> <b>${esc(section)}</b></div><div class="top-actions"><span class="demo-pill"><span class="live-dot"></span> PUBLIC DEMO</span><button class="avatar" title="Demo workspace" aria-label="Demo workspace">S</button></div></header><main id="content"></main><footer>Independent portfolio project · All example conversations are fictional · Interpretations require human review</footer></div></div><div id="drawer-root"></div><div id="toast-root" role="status" aria-live="polite"></div>`;
   app.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => { section = button.dataset.nav; selected = null; page = 1; render(); }));
   content();
   if (selected) drawer(selected);
@@ -43,6 +45,7 @@ function overview(root) {
   <div class="grid-main"><section class="panel"><div class="panel-head"><div><div class="eyebrow">SIGNAL DISTRIBUTION</div><h2>Recurring themes</h2></div><button class="text-link" data-go="Behavioral Insights">View insights ↗</button></div><p class="panel-sub">Conversation counts with at least one matching cue. A conversation can appear in multiple themes.</p><div class="bar-list">${top.map(c => `<div class="bar-row"><div class="bar-label"><span class="swatch" style="background:${c.color}"></span>${c.label}</div><div class="bar-track"><span style="width:${Math.round(c.count / Math.max(1, data.total) * 100)}%;background:${c.color}"></span></div><strong>${c.count.toString().padStart(2, '0')}</strong></div>`).join('')}</div><div class="panel-foot">Cue matches indicate topics for review, not measured prevalence in a population.</div></section><section class="panel workflow"><div class="panel-head"><div><div class="eyebrow">FROM INSIGHT TO ACTION</div><h2>Research workflow</h2></div></div><div class="flow-list"><div><b>01</b><span><strong>Listen</strong><small>Read the customer's own words.</small></span></div><div><b>02</b><span><strong>Interpret</strong><small>Review a possible mechanism and alternative.</small></span></div><div><b>03</b><span><strong>Test</strong><small>Design a measurable intervention.</small></span></div></div><button class="text-link" data-go="Experiments">Explore experiment ideas <span>↗</span></button></section></div>
   <section class="panel recent"><div class="panel-head"><div><div class="eyebrow">LATEST RECORDS</div><h2>Recent conversations</h2></div><button class="text-link" data-go="Conversations">View all ↗</button></div><div class="table-wrap"><table><thead><tr><th>ACCOUNT / CONTACT</th><th>STAGE</th><th>BEHAVIORAL SIGNALS</th><th>DATE</th><th></th></tr></thead><tbody>${recent.map(r => `<tr><td><strong>${esc(r.account)}</strong><small>${esc(r.role)}</small></td><td>${esc(r.stage)}</td><td>${analyze(r).slice(0, 2).map(f => chip(f.label, f.color)).join('') || '<span class="muted">Insufficient evidence</span>'}</td><td>${date(r.date)}</td><td><button class="row-arrow" data-open="${esc(r.id)}" aria-label="Open ${esc(r.id)}">↗</button></td></tr>`).join('')}</tbody></table></div></section>`;
 }
+// Apply filters before pagination; otherwise a search would only inspect the visible page.
 function filtered() {
   let records = all().filter(r => `${r.account} ${r.role} ${r.text} ${r.id}`.toLowerCase().includes(query.toLowerCase()) && (stage === 'All stages' || r.stage === stage));
   records.sort((a, b) => sort === 'Oldest' ? a.date.localeCompare(b.date) : sort === 'Account A–Z' ? a.account.localeCompare(b.account) : b.date.localeCompare(a.date));
@@ -62,6 +65,7 @@ function conversations(root) {
   root.querySelector('#import-file').addEventListener('change', async e => { try { const parsed = validateImport(JSON.parse(await e.target.files[0].text())); const existing = new Set(demo.map(r => r.id)); if (parsed.some(r => existing.has(r.id))) throw new Error('An imported ID matches a demo record. Use unique IDs.'); imported = parsed; localStorage.setItem('sentient-import-v1', JSON.stringify(imported)); notice = `${parsed.length} conversation${parsed.length === 1 ? '' : 's'} imported locally.`; render(); } catch (error) { notice = `Import failed: ${error.message}`; render(); } });
   root.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { selected = b.dataset.open; drawer(selected); }));
 }
+// Timelines preserve reported chronology only. They deliberately avoid a causal improvement score.
 function insights(root) {
   const { counts } = summarize(all());
   const accounts = [...new Set(all().map(r => r.account))];
@@ -95,5 +99,6 @@ function drawer(id) {
   const onKey = e => { if (e.key === 'Escape') close(); };
   root.querySelector('#scrim').addEventListener('click', close); root.querySelector('#close-drawer').addEventListener('click', close); document.addEventListener('keydown', onKey); root.querySelector('#close-drawer').focus();
 }
+// Storage can be stale or edited outside the app. Revalidate on load and fall back to the fixture.
 try { imported = validateImport(JSON.parse(localStorage.getItem('sentient-import-v1') || '[]')); } catch { imported = []; localStorage.removeItem('sentient-import-v1'); }
 fetch('/data/synthetic/conversations.json').then(r => { if (!r.ok) throw new Error('Data unavailable'); return r.json(); }).then(records => { demo = records; render(); }).catch(() => { app.innerHTML = '<div class="load-error">Demo data could not load. Refresh the page or run <code>npm start</code>.</div>'; });

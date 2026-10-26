@@ -1,6 +1,6 @@
-<p align="center"><img src="assets/header.svg" alt="SENTIENT — Beyond sentiment. Understand the behavior behind customer adoption." width="100%"></p>
+<p align="center"><img src="assets/header.svg" alt="Sentient — AI Enablement Marketer" width="100%"></p>
 
-<p align="center"><strong>Behavioral science × transparent analysis × growth experimentation</strong></p>
+<p align="center"><strong>A project by Pahul Sachdeva · Behavioral science × customer education × growth</strong></p>
 
 ## Why this exists
 
@@ -75,7 +75,7 @@ flowchart LR
   C --> D["Test proposals"]
 ```
 
-See [architecture](docs/architecture.md), [product brief](docs/product-brief.md), and [roadmap](docs/roadmap.md). A structured-output LLM adapter is planned, but **this MVP does not call an LLM**. The honest deterministic mode keeps the public experience free and auditable.
+See [development notes](docs/development-notes.md), [architecture](docs/architecture.md), [product brief](docs/product-brief.md), and [roadmap](docs/roadmap.md). A structured-output LLM adapter is planned, but **this MVP does not call an LLM**. The honest deterministic mode keeps the public experience free and auditable.
 
 ## Research, evaluation, and responsibility
 
