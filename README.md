@@ -19,7 +19,7 @@ This is an **independent portfolio project** by Pahul Sachdeva, combining a neur
 
 **Example:** a fictional manager says a six-screen setup guide left them unsure where to start. The app surfaces *cognitive effort* and *uncertainty* as possible interpretations and links back to the actual sentence. It proposes testing a shorter checklist against seven-day setup completion. It does **not** claim the checklist works. [Read the case study](docs/case-study.md).
 
-> **Release status:** The application and tests are built locally. GitHub publication, a live deployment, and actual product screenshots are pending. No unverified link or screenshot is presented as a finished demo.
+> **Release status:** The application and tests are built and stored in this private GitHub draft. Public publication, a live deployment, and actual product screenshots are pending. No unverified link or screenshot is presented as a finished demo.
 
 ## Run it
 

@@ -1,0 +1,40 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { analyze, recommendations, summarize, validateImport } from '../apps/web/analysis.js';
+
+const records = JSON.parse(readFileSync(new URL('../data/synthetic/conversations.json', import.meta.url)));
+test('every displayed finding traces to an exact source excerpt', () => {
+  for (const record of records) for (const finding of analyze(record)) {
+    assert.ok(finding.excerpts.length);
+    for (const evidence of finding.excerpts) {
+      assert.equal(record.text.slice(evidence.start, evidence.end).trim(), evidence.excerpt);
+      assert.ok(finding.alternative);
+      assert.equal(finding.status, 'Needs human review');
+    }
+  }
+});
+test('unsupported text has no inferred construct', () => {
+  assert.deepEqual(analyze({ id: 'X', text: 'We spoke on Tuesday.' }), []);
+});
+test('counts use records rather than repeated cue matches', () => {
+  const result = summarize(records);
+  assert.equal(result.total, 12);
+  assert.equal(result.accounts, 5);
+  for (const count of result.counts) assert.equal(count.count, result.findings.filter(f => f.constructId === count.id).length);
+});
+test('every experiment has a supported cue and no fabricated outcome', () => {
+  for (const idea of recommendations(records)) {
+    assert.ok(idea.evidence.length);
+    assert.ok(idea.design.includes('Randomiz') || idea.design.includes('randomiz') || idea.design.includes('Assign'));
+    assert.match(idea.hypothesis, /untested/);
+  }
+});
+test('import validation rejects malformed, duplicate, and oversize input', () => {
+  const good = { id: 'I-1', account: 'Fictional Co', role: 'Manager', date: '2026-03-01', text: 'A sample.' };
+  assert.equal(validateImport([good])[0].imported, true);
+  assert.throws(() => validateImport([good, good]), /duplicate/);
+  assert.throws(() => validateImport([{ ...good, text: '' }]), /text/);
+  assert.throws(() => validateImport([{ ...good, date: 'yesterday' }]), /date/);
+  assert.throws(() => validateImport(Array(501).fill(good)), /500/);
+});
