@@ -1,16 +1,17 @@
-# Evaluation and known limits
+# Evaluation
 
-## Verified in this release
+## Engineering checks
 
-`npm test` checks that every generated excerpt is an exact substring at the reported offsets, unsupported text produces no interpretation, counts are record-based, experiment proposals cite findings and say *untested*, and malformed imports are rejected. `npm run check` syntax-checks the application modules. These are engineering checks, not scientific validation.
+Run `npm test` to check evidence spans, abstention, record counts, experiment plans, and import validation. Run `npm run check` to check JavaScript syntax.
 
-## Not evaluated
+Every evidence span must point to the original text. Several phrase matches in the same interview should contribute only one count per construct. An unrelated sentence should produce no interpretation.
 
-- There is no human-labeled benchmark, measured precision/recall, inter-rater agreement, calibrated uncertainty, or external validity claim.
-- No live customer data or experiments were used. No conversion or retention uplift is reported.
-- The authored synthetic data intentionally contains obvious cues and cannot establish performance on natural speech.
-- Phrase rules can miss paraphrases and match language taken out of context. No semantic or LLM inference is present in the MVP.
+## What to evaluate next
 
-## Next evaluation gate
+The phrase rules need a broader set of independently reviewed examples. Useful cases include paraphrases, negation, ambiguous language, and interviews with no clear signal. Reviewers should code whether the excerpt supports the label and whether a different explanation is more plausible.
 
-Create a consented, de-identified dataset with explicit annotation guidelines and an insufficient-evidence label. Split by account before training or tuning to prevent leakage. Report per-construct precision, recall, abstention rate, and disagreement. Review false positives and group differences before considering product use.
+Split future evaluation data by person before tuning the rules, so follow-ups from the same person do not appear on both sides. Report precision, recall, abstention, and reviewer disagreement by construct.
+
+## Measuring a product change
+
+The experiment plans describe work to run next. For the study onboarding example, assign eligible new users at random, define quiz completion before starting, and inspect repeat study use and appropriate verification alongside the primary outcome. Interview themes help select that test; product events would supply its results.

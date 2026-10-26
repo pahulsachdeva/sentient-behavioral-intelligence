@@ -1,7 +1,7 @@
-# Privacy and responsible use
+# Data choices
 
-All included conversations and organizations are invented for this project. They do not reproduce employer records, transcripts, designs, or processes. SENTIENT is an independent portfolio project with no employer endorsement.
+I built the consumer AI assistant interviews for this project so I could explore the idea without using my company's internal examples. The names, interviews, and follow-ups belong to this case study. EliseAI is the context for my interest in the problem; this is my independent project.
 
-JSON imports are handled in the browser and retained in that browser's `localStorage` until cleared. The app does not send them to an AI provider or store them on the demo server. Browser storage is not a secure repository for confidential information. Do not import personal, confidential, or employer data into a public or shared device.
+Imports stay in the browser's local storage. Research Workspace includes a control to clear them. Use examples you have permission to work with, and avoid storing confidential transcripts on a shared device.
 
-The analysis never assigns a clinical state, claims a causal mechanism, or reports model confidence. Human review is required before an interpretation is used in research, product changes, or outreach.
+The source excerpt stays beside each interpretation so a reviewer can check the reading, consider another explanation, and decide what to ask next.

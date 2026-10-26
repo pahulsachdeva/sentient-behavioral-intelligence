@@ -1,11 +1,9 @@
 # Product brief
 
-**Audience:** growth, product, customer research, and customer success teams investigating technology adoption.
+Sentient helps turn user interviews into questions a product, customer education, or growth team can test.
 
-**Problem:** a sentiment label collapses concrete user concerns into a single score. A team needs source language, cautious interpretations, and a way to test interventions.
+The case study is a consumer AI assistant used for studying, personal writing, daily planning, and learning to code. The working question is what helps a new user get a useful result and come back. This consumer setting gives the project room to explore enablement ideas independently of EliseAI's B2B work.
 
-**MVP:** a local, publicly explorable synthetic workspace with conversation search/import, transparent cue rules, evidence, account timelines, and experiment proposals. No hosted AI service, credentials, or private customer data are required.
+The workspace includes a conversation library, source excerpts, candidate interpretations, repeat interviews, and experiment plans. A person can move from a sentence in an interview to an intervention and a measurable outcome without losing the original context.
 
-**Core journey:** a user reads a fictional account statement → inspects an exact excerpt and competing interpretation → opens a proposed intervention → sees a measurable outcome and experiment design.
-
-**Success criteria for a future real pilot:** research reviewers can locate every supporting excerpt, reject unsupported interpretations, and design tests without mistaking suggestions for proven effects. This demo has not been evaluated on real users.
+The first useful research milestone will be independent reviewers agreeing on which excerpts support a label and which should be left uncategorized. The next product milestone is connecting those questions to task and return-use events.
