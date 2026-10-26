@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/header.svg" alt="Sentient — AI Enablement Marketer" width="100%"></p>
+<p align="center"><img src="assets/header.svg" alt="Sentient — AI Enablement Marker" width="100%"></p>
 
 <p align="center">A project by Pahul Sachdeva · Customer understanding, education, and adoption</p>
 
