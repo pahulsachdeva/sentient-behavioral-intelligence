@@ -42,6 +42,7 @@ The main outcome would be **first quiz completion**. I'd also look at whether pe
 
 - Search the interviews, filter by stage, and read the full conversation.
 - Inspect the sentence behind a behavioral interpretation and consider another explanation.
+- Save a Supported, Not supported, or Uncertain review with reasoning; filter and export the current evidence reviews.
 - Follow the same person over time to see how their experience changes.
 - Explore experiment ideas with an intervention, outcome, and suggested test design.
 - Import a JSON file to try the workflow with your own examples.
@@ -93,6 +94,7 @@ To import examples, use an array with `id`, `account` (the person's name or ID),
 
 ## Where I'm taking it next
 
-The next pieces are a hosted demo, better handling of paraphrases and negation, and a way to save reviewer decisions. I'd also like to connect the interview view to task and retention events so I can work through the measurement questions above.
+The next pieces are a hosted demo, better handling of paraphrases and negation, and independently reviewed examples. Reviewer decisions now save alongside evidence in the browser. I'd also like to connect the interview view to task and retention events so I can work through the measurement questions above.
 
 [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
+
