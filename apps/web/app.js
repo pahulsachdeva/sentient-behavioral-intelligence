@@ -1,4 +1,5 @@
 import { analyze, constructs, recommendations, summarize, validateImport } from './analysis.js';
+import { reviewStatuses, getReview, upsertReview, loadReviews, persistReviews, reviewExport } from './reviews.js';
 
 const app = document.getElementById('app');
 // Keep the authored fixture separate from imports so clearing browser data never removes the demo.
@@ -12,6 +13,9 @@ let sort = 'Newest';
 let page = 1;
 let activeConstruct = 'all';
 let notice = '';
+let reviews = loadReviews({ getItem: key => localStorage.getItem(key) });
+let reviewFilter = 'All reviews';
+let removeDrawerListener = () => {};
 const nav = ['Overview', 'Conversations', 'Behavioral Insights', 'Evidence Explorer', 'Experiments', 'Research Workspace'];
 const icons = { Overview: '◫', Conversations: '≡', 'Behavioral Insights': '◈', 'Evidence Explorer': '⌕', Experiments: '◇', 'Research Workspace': '▤' };
 // Source text is untrusted, including local imports. Escape it at the HTML rendering boundary.
@@ -22,6 +26,7 @@ const chip = (label, color = '#a78bfa') => `<span class="chip" style="--chip:${c
 const sectionHeading = (eyebrow, title, description, action = '') => `<div class="heading"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p></div>${action}</div>`;
 const findRecord = id => all().find(r => r.id === id);
 function shell() {
+  removeDrawerListener();
   app.innerHTML = `<div class="shell"><aside class="sidebar"><div class="brand"><img src="/assets/mark.svg" alt=""><div><strong>Sentient</strong><small>AI ENABLEMENT MARKER</small></div></div><div class="workspace-label">WORKSPACE <span class="workspace-tag">DEMO</span></div><nav aria-label="Main navigation">${nav.map(n => `<button class="nav-item ${section === n ? 'active' : ''}" data-nav="${n}"><span class="nav-icon">${icons[n]}</span>${n}</button>`).join('')}</nav><div class="sidebar-bottom"><div class="source-card"><span class="source-icon">✳</span><div><strong>Practice workspace</strong><span>Consumer AI assistant</span></div></div><a class="sidebar-link" href="/docs/methodology.md" target="_blank">Methodology <span>↗</span></a></div></aside><div class="main"><header class="topbar"><div class="crumb">WORKSPACE <span>/</span> <b>${esc(section)}</b></div><div class="top-actions"><span class="demo-pill"><span class="live-dot"></span> EXAMPLE WORKSPACE</span><button class="avatar" title="Demo workspace" aria-label="Demo workspace">S</button></div></header><main id="content"></main><footer>Sentient · Customer understanding, education, and adoption</footer></div></div><div id="drawer-root"></div><div id="toast-root" role="status" aria-live="polite"></div>`;
   app.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => { section = button.dataset.nav; selected = null; page = 1; render(); }));
   content();
@@ -74,10 +79,37 @@ function insights(root) {
   root.querySelectorAll('[data-construct]').forEach(b => b.addEventListener('click', () => { activeConstruct = b.dataset.construct; section = 'Evidence Explorer'; render(); }));
 }
 function evidence(root) {
-  const findings = all().flatMap(analyze).filter(f => activeConstruct === 'all' || f.constructId === activeConstruct);
-  root.innerHTML = `${sectionHeading('EVIDENCE EXPLORER', 'Trace every interpretation.', 'Each candidate signal links to the exact source sentence, an alternative explanation, and a human review status.')}
-  <div class="filter-chips">${[{ id: 'all', label: 'All signals' }, ...constructs].map(c => `<button class="filter-chip ${activeConstruct === c.id ? 'chosen' : ''}" data-filter="${c.id}">${c.label}</button>`).join('')}</div><div class="evidence-list">${findings.map(f => { const r = findRecord(f.recordId); return `<article class="evidence-card"><div class="evidence-header"><div>${chip(f.label, f.color)} <span>${esc(r.account)} · ${date(r.date)}</span></div><span class="review-state">◌ ${f.status}</span></div><h3>${esc(f.hypothesis)}</h3><blockquote>“${esc(f.excerpts[0].excerpt)}”</blockquote><div class="evidence-footer"><span>${f.evidenceLevel} · Rule-based cue</span><span>Alternative: ${esc(f.alternative)}</span></div><button data-open="${esc(r.id)}">Read full conversation ↗</button></article>`; }).join('') || '<div class="empty">No cues found in this category. Treat this as insufficient evidence.</div>'}</div>`;
-  root.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { activeConstruct = b.dataset.filter; evidence(root); }));
+  const findings = all().flatMap(analyze).filter(f => (activeConstruct === 'all' || f.constructId === activeConstruct) && (reviewFilter === 'All reviews' || (getReview(reviews, findRecord(f.recordId), f)?.status || 'Needs human review') === reviewFilter));
+  root.innerHTML = `${sectionHeading('EVIDENCE EXPLORER', 'Trace every interpretation.', 'Review the source sentence and alternative explanation, then save your decision and reasoning.', '<button class="button secondary" id="export-reviews">Export reviews</button>')}
+  <div class="review-toolbar"><label for="review-filter">Review status</label><select id="review-filter">${['All reviews', 'Needs human review', ...reviewStatuses].map(status => `<option ${reviewFilter === status ? 'selected' : ''}>${status}</option>`).join('')}</select><p>Saved in this browser. Cue counts remain descriptive; review decisions do not change them.</p></div>
+  <div class="filter-chips">${[{ id: 'all', label: 'All signals' }, ...constructs].map(c => `<button class="filter-chip ${activeConstruct === c.id ? 'chosen' : ''}" data-filter="${c.id}">${c.label}</button>`).join('')}</div><div class="evidence-list">${findings.map(f => { const r = findRecord(f.recordId); return `<article class="evidence-card"><div class="evidence-header"><div>${chip(f.label, f.color)} <span>${esc(r.account)} · ${date(r.date)}</span></div><span class="review-state">◌ ${esc(getReview(reviews, r, f)?.status || f.status)}</span></div><h3>${esc(f.hypothesis)}</h3><blockquote>“${esc(f.excerpts[0].excerpt)}”</blockquote><div class="evidence-footer"><span>${f.evidenceLevel} · Rule-based cue</span><span>Alternative: ${esc(f.alternative)}</span></div><button data-open="${esc(r.id)}">Read full conversation ↗</button>${reviewForm(r, f)}</article>`; }).join('') || '<div class="empty">No cues found in this category. Treat this as insufficient evidence.</div>'}</div>`;
+  root.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { activeConstruct = b.dataset.filter; render(); }));
+  root.querySelector('#review-filter').addEventListener('change', e => { reviewFilter = e.target.value; render(); });
+  root.querySelector('#export-reviews').addEventListener('click', exportReviews);
+  bindReviews(root);
+}
+function reviewForm(record, finding) {
+  const review = getReview(reviews, record, finding);
+  return `<form class="review-form" data-review="${esc(finding.id)}" aria-label="Review ${esc(record.id)} ${esc(finding.label)}"><label>Decision<select name="status" required><option value="">Choose a decision</option>${reviewStatuses.map(status => `<option ${review?.status === status ? 'selected' : ''}>${status}</option>`).join('')}</select></label><label>Reasoning or follow-up<textarea name="note" maxlength="2000" rows="3" placeholder="What supports or challenges this interpretation?">${esc(review?.note || '')}</textarea></label><button class="button secondary" type="submit">Save review</button><span role="status" class="review-feedback">${review ? `Saved ${esc(new Date(review.reviewedAt).toLocaleString())}` : 'No decision saved'}</span></form>`;
+}
+function bindReviews(root) {
+  root.querySelectorAll('[data-review]').forEach(form => form.addEventListener('submit', event => {
+    event.preventDefault();
+    const record = all().find(record => analyze(record).some(finding => finding.id === form.dataset.review));
+    const finding = analyze(record).find(finding => finding.id === form.dataset.review);
+    const data = new FormData(form);
+    try {
+      const next = upsertReview(reviews, record, finding, data.get('status'), data.get('note'));
+      reviews = persistReviews(localStorage, next);
+      notice = 'Review saved in this browser.';
+      render();
+    } catch (error) { form.querySelector('.review-feedback').textContent = `Review could not be saved: ${error.message}`; }
+  }));
+}
+function exportReviews() {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(reviewExport(all(), analyze, reviews), null, 2)], { type: 'application/json' }));
+  const link = document.createElement('a'); link.href = url; link.download = 'sentient-evidence-reviews.json'; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function experiments(root) {
   const ideas = recommendations(all());
@@ -87,18 +119,22 @@ function experiments(root) {
 }
 function research(root) {
   root.innerHTML = `${sectionHeading('RESEARCH WORKSPACE', 'A transparent analytical frame.', 'Use this space to understand what the demo can and cannot infer from customer language.')}
-  <div class="research-layout"><section class="panel"><div class="eyebrow">METHOD</div><h2>Interpretation pipeline</h2><div class="method-step"><b>01</b><div><strong>Source record</strong><p>An interview with a person, use case, date, and source text.</p></div></div><div class="method-step"><b>02</b><div><strong>Transparent cue match</strong><p>Inspectable phrase rules surface one or more candidate constructs, with the exact sentence retained.</p></div></div><div class="method-step"><b>03</b><div><strong>Human interpretation</strong><p>Each hypothesis includes an alternative. A researcher should confirm meaning with follow-up questions.</p></div></div><div class="method-step"><b>04</b><div><strong>Experiment proposal</strong><p>A test design and outcome make the idea falsifiable. It is not a claim of causal impact.</p></div></div></section><section class="panel"><div class="eyebrow">LIMITATIONS</div><h2>What the signals mean</h2><ul class="limitation-list"><li>Counts are conversations with matching cues, not prevalence estimates.</li><li>A phrase can have different meanings in different contexts.</li><li>Multiple themes can occur in one record.</li><li>Start with the example interviews, then review the rules against a broader sample.</li><li>Repeated records show reported change; they do not prove why it happened.</li><li>Imported data stays in local browser storage; clear it from this workspace below.</li></ul><button class="button secondary" id="clear-import">Clear imported records</button><div class="doc-links"><a href="/docs/methodology.md" target="_blank">Read methodology ↗</a><a href="/docs/evaluation.md" target="_blank">Read evaluation ↗</a></div></section></div>`;
-  root.querySelector('#clear-import').addEventListener('click', () => { imported = []; localStorage.removeItem('sentient-import-v1'); notice = 'Imported records cleared.'; render(); });
+  <div class="research-layout"><section class="panel"><div class="eyebrow">METHOD</div><h2>Interpretation pipeline</h2><div class="method-step"><b>01</b><div><strong>Source record</strong><p>An interview with a person, use case, date, and source text.</p></div></div><div class="method-step"><b>02</b><div><strong>Transparent cue match</strong><p>Inspectable phrase rules surface one or more candidate constructs, with the exact sentence retained.</p></div></div><div class="method-step"><b>03</b><div><strong>Human interpretation</strong><p>Each hypothesis includes an alternative. A researcher should confirm meaning with follow-up questions.</p></div></div><div class="method-step"><b>04</b><div><strong>Experiment proposal</strong><p>A test design and outcome make the idea falsifiable. It is not a claim of causal impact.</p></div></div></section><section class="panel"><div class="eyebrow">LIMITATIONS</div><h2>What the signals mean</h2><ul class="limitation-list"><li>Counts are conversations with matching cues, not prevalence estimates.</li><li>A phrase can have different meanings in different contexts.</li><li>Multiple themes can occur in one record.</li><li>Start with the example interviews, then review the rules against a broader sample.</li><li>Repeated records show reported change; they do not prove why it happened.</li><li>Imported data stays in local browser storage; clear it from this workspace below.</li></ul><button class="button secondary" id="clear-import">Clear imported records</button><button class="button secondary" id="clear-reviews">Clear all saved reviews</button><div class="doc-links"><a href="/docs/methodology.md" target="_blank">Read methodology ↗</a><a href="/docs/evaluation.md" target="_blank">Read evaluation ↗</a></div></section></div>`;
+  root.querySelector('#clear-import').addEventListener('click', () => { try { const ids = new Set(imported.map(record => record.id)); reviews = persistReviews(localStorage, reviews.filter(review => !ids.has(review.recordId))); localStorage.removeItem('sentient-import-v1'); imported = []; notice = 'Imported records and their reviews cleared.'; } catch (error) { notice = `Could not clear records: ${error.message}`; } render(); });
+  root.querySelector('#clear-reviews').addEventListener('click', () => { try { reviews = persistReviews(localStorage, []); notice = 'Saved reviews cleared.'; } catch (error) { notice = `Could not clear reviews: ${error.message}`; } render(); });
 }
 function drawer(id) {
+  removeDrawerListener();
   const r = findRecord(id); if (!r) return;
   const findings = analyze(r);
   const root = document.getElementById('drawer-root');
-  root.innerHTML = `<div class="scrim" id="scrim"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="Conversation ${esc(r.id)}"><div class="drawer-head"><span>CONVERSATION / ${esc(r.id)}</span><button id="close-drawer" aria-label="Close conversation">×</button></div><div class="drawer-body"><div class="eyebrow">SOURCE RECORD · ${r.imported ? 'IMPORTED' : 'EXAMPLE INTERVIEW'}</div><h2>${esc(r.account)}</h2><p class="drawer-byline">${esc(r.role)} · ${esc(r.channel)} · ${date(r.date)}</p><div class="drawer-section"><h3>Customer statement</h3><blockquote>“${esc(r.text)}”</blockquote></div><div class="drawer-section"><h3>Questions for follow-up <span>${findings.length}</span></h3>${findings.map(f => `<div class="drawer-finding">${chip(f.label, f.color)}<p>${esc(f.hypothesis)}</p><small>SUPPORTING EXCERPT</small><blockquote>“${esc(f.excerpts[0].excerpt)}”</blockquote><small>ALTERNATIVE EXPLANATION</small><p>${esc(f.alternative)}</p><div class="review-state">◌ Needs human review · ${f.evidenceLevel}</div></div>`).join('') || '<p class="muted">Insufficient evidence for the current cue rules. No psychological interpretation is assigned.</p>'}</div></div></aside>`;
+  root.innerHTML = `<div class="scrim" id="scrim"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="Conversation ${esc(r.id)}"><div class="drawer-head"><span>CONVERSATION / ${esc(r.id)}</span><button id="close-drawer" aria-label="Close conversation">×</button></div><div class="drawer-body"><div class="eyebrow">SOURCE RECORD · ${r.imported ? 'IMPORTED' : 'EXAMPLE INTERVIEW'}</div><h2>${esc(r.account)}</h2><p class="drawer-byline">${esc(r.role)} · ${esc(r.channel)} · ${date(r.date)}</p><div class="drawer-section"><h3>Customer statement</h3><blockquote>“${esc(r.text)}”</blockquote></div><div class="drawer-section"><h3>Questions for follow-up <span>${findings.length}</span></h3>${findings.map(f => `<div class="drawer-finding">${chip(f.label, f.color)}<p>${esc(f.hypothesis)}</p><small>SUPPORTING EXCERPT</small><blockquote>“${esc(f.excerpts[0].excerpt)}”</blockquote><small>ALTERNATIVE EXPLANATION</small><p>${esc(f.alternative)}</p><div class="review-state">◌ ${esc(getReview(reviews, r, f)?.status || f.status)} · ${f.evidenceLevel}</div>${reviewForm(r, f)}</div>`).join('') || '<p class="muted">Insufficient evidence for the current cue rules. No psychological interpretation is assigned.</p>'}</div></div></aside>`;
+  bindReviews(root);
   const close = () => { selected = null; root.innerHTML = ''; document.removeEventListener('keydown', onKey); };
   const onKey = e => { if (e.key === 'Escape') close(); };
-  root.querySelector('#scrim').addEventListener('click', close); root.querySelector('#close-drawer').addEventListener('click', close); document.addEventListener('keydown', onKey); root.querySelector('#close-drawer').focus();
+  root.querySelector('#scrim').addEventListener('click', close); root.querySelector('#close-drawer').addEventListener('click', close); document.addEventListener('keydown', onKey); removeDrawerListener = () => document.removeEventListener('keydown', onKey); root.querySelector('#close-drawer').focus();
 }
 // Storage can be stale or edited outside the app. Revalidate on load and fall back to the fixture.
-try { imported = validateImport(JSON.parse(localStorage.getItem('sentient-import-v1') || '[]')); } catch { imported = []; localStorage.removeItem('sentient-import-v1'); }
+try { imported = validateImport(JSON.parse(localStorage.getItem('sentient-import-v1') || '[]')); } catch { imported = []; try { localStorage.removeItem('sentient-import-v1'); } catch {} }
 fetch('/data/synthetic/conversations.json').then(r => { if (!r.ok) throw new Error('Data unavailable'); return r.json(); }).then(records => { demo = records; render(); }).catch(() => { app.innerHTML = '<div class="load-error">Demo data could not load. Refresh the page or run <code>npm start</code>.</div>'; });
+
