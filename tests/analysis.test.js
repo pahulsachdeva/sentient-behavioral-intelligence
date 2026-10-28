@@ -38,3 +38,18 @@ test('import validation rejects malformed, duplicate, and oversize input', () =>
   assert.throws(() => validateImport([{ ...good, date: 'yesterday' }]), /date/);
   assert.throws(() => validateImport(Array(501).fill(good)), /500/);
 });
+
+test('evidence stops at the nearest sentence punctuation', () => {
+  const record = { id: 'P', text: 'We spoke yesterday! I was unsure what to do? The next task was fine.' };
+  const finding = analyze(record).find(item => item.constructId === 'uncertainty');
+  assert.deepEqual(finding.excerpts.map(item => item.excerpt), ['I was unsure what to do?']);
+  assert.equal(record.text.slice(finding.excerpts[0].start, finding.excerpts[0].end).trim(), finding.excerpts[0].excerpt);
+});
+
+test('import dates must exist on the calendar, including leap years', () => {
+  const row = { id: 'I-2', account: 'Taylor', role: 'Study', date: '2024-02-29', text: 'A sample.' };
+  assert.equal(validateImport([row])[0].date, '2024-02-29');
+  for (const date of ['2026-02-29', '2026-02-30', '2026-04-31', '2026-13-01', '0000-01-01']) {
+    assert.throws(() => validateImport([{ ...row, date }]), /valid YYYY-MM-DD/);
+  }
+});
