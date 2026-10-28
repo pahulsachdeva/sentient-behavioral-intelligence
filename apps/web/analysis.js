@@ -20,10 +20,11 @@ export function analyze(record) {
       const match = pattern.exec(text);
       if (!match) return [];
       // Retain surrounding language so reviewers can challenge a match in context.
-      // TODO: replace period boundaries before supporting abbreviations and multilingual text.
-      const start = Math.max(0, text.lastIndexOf('.', match.index - 1) + 1);
-      const endIndex = text.indexOf('.', match.index + match[0].length);
-      const end = endIndex === -1 ? text.length : endIndex + 1;
+      // Simple punctuation boundaries; abbreviations and multilingual segmentation need separate evaluation.
+      const previousBoundary = Math.max(...['.', '!', '?'].map(mark => text.lastIndexOf(mark, match.index - 1)));
+      const start = previousBoundary + 1;
+      const nextBoundaries = ['.', '!', '?'].map(mark => text.indexOf(mark, match.index + match[0].length)).filter(index => index !== -1);
+      const end = nextBoundaries.length ? Math.min(...nextBoundaries) + 1 : text.length;
       return [{ excerpt: text.slice(start, end).trim(), start, end }];
     });
     // Several rules may match the same sentence. Count that sentence once.
@@ -85,6 +86,15 @@ export function recommendations(records) {
   return counts.filter(c => c.count).sort((a, b) => b.count - a.count).map(c => ({ ...c, ...experimentTemplates[c.id], evidence: findings.filter(f => f.constructId === c.id).slice(0, 3), hypothesis: `If ${c.label.toLowerCase()} is a barrier for this audience, the proposed change may improve the stated outcome. This remains untested.` }));
 }
 
+/** Reject rollover dates such as February 30 while preserving YYYY-MM-DD input. */
+function isCalendarDate(value) {
+  const [year, month, day] = value.split('-').map(Number);
+  if (year < 1 || month < 1 || month > 12 || day < 1) return false;
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysInMonth[month - 1];
+}
+
 /** Bound input size for the browser demo and return only fields the app understands. */
 export function validateImport(value) {
   if (!Array.isArray(value) || value.length > 500) throw new Error('Import a JSON array of at most 500 conversations.');
@@ -92,7 +102,7 @@ export function validateImport(value) {
   return value.map((item, index) => {
     if (!item || typeof item !== 'object') throw new Error(`Row ${index + 1}: expected an object.`);
     for (const key of ['id', 'account', 'role', 'date', 'text']) if (typeof item[key] !== 'string' || !item[key].trim()) throw new Error(`Row ${index + 1}: ${key} is required.`);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date) || Number.isNaN(Date.parse(item.date))) throw new Error(`Row ${index + 1}: use YYYY-MM-DD for date.`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date) || !isCalendarDate(item.date)) throw new Error(`Row ${index + 1}: use a valid YYYY-MM-DD date.`);
     if (item.text.length > 12000) throw new Error(`Row ${index + 1}: text exceeds 12,000 characters.`);
     if (ids.has(item.id)) throw new Error(`Row ${index + 1}: duplicate ID.`);
     ids.add(item.id);

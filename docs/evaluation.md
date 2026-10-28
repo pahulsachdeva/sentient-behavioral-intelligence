@@ -4,7 +4,7 @@
 
 Run `npm test` to check evidence spans, abstention, record counts, experiment plans, and import validation. Run `npm run check` to check JavaScript syntax.
 
-Every evidence span must point to the original text. Several phrase matches in the same interview should contribute only one count per construct. An unrelated sentence should produce no interpretation.
+Every evidence span must point to the original text. Several phrase matches in the same interview should contribute only one count per construct. An unrelated sentence should produce no interpretation. Evidence excerpts stop at the nearest period, question mark, or exclamation mark; abbreviations and multilingual segmentation still need evaluation. Import dates must be real calendar dates, including leap-day rules.
 
 ## What to evaluate next
 
