@@ -11,10 +11,11 @@ The case study follows a consumer AI assistant. It focuses on the steps between 
 ## Next pieces
 
 - Host the app and inspect the desktop and mobile experience.
-- Improve phrase handling for negation, paraphrases, and sentence boundaries.
+- Independently review the uncertainty regression cases and broaden phrase handling beyond direct negation.
 - Evaluate reviewer agreement on an independently coded set of interviews.
 - Connect interview questions to task completion and return-use events.
 - Evaluate an optional model adapter against the same evidence requirements.
 
 [Track the work in GitHub Issues](https://github.com/pahulsachdeva/sentient-behavioral-intelligence/issues).
+
 
