@@ -1,0 +1,88 @@
+[
+  {
+    "id": "resolved-study",
+    "text": "I am not unsure anymore.",
+    "expected": []
+  },
+  {
+    "id": "resolved-writing",
+    "text": "I am no longer uncertain about the rewrite.",
+    "expected": []
+  },
+  {
+    "id": "resolved-planning",
+    "text": "I don't feel unsure now.",
+    "expected": []
+  },
+  {
+    "id": "uncertain-study",
+    "text": "I am unsure how to begin studying.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "past-coding",
+    "text": "I wasn't sure how to start coding.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "paraphrase-planning",
+    "text": "I don't know where to start planning.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "paraphrase-writing",
+    "text": "I did not know how to begin the rewrite.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "negative-wording",
+    "text": "I am not sure how to begin.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "contrast",
+    "text": "I am not only uncertain, I am confused.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "resolved-then-new",
+    "text": "I am not unsure about saving. I am unsure about billing.",
+    "expected": [
+      "uncertainty"
+    ]
+  },
+  {
+    "id": "known-start",
+    "text": "I know how to start now.",
+    "expected": []
+  },
+  {
+    "id": "unrelated",
+    "text": "We met for a short chat.",
+    "expected": []
+  },
+  {
+    "id": "substring",
+    "text": "The title was uncertainty estimation.",
+    "expected": []
+  },
+  {
+    "id": "mixed",
+    "text": "It takes time. I am not unsure.",
+    "expected": [
+      "effort"
+    ]
+  }
+]

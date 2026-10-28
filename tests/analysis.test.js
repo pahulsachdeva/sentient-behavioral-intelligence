@@ -53,3 +53,17 @@ test('import dates must exist on the calendar, including leap years', () => {
     assert.throws(() => validateImport([{ ...row, date }]), /valid YYYY-MM-DD/);
   }
 });
+
+
+const uncertaintyCases = JSON.parse(readFileSync(new URL('../data/evaluation/uncertainty-cases.json', import.meta.url)));
+test('authored uncertainty cases distinguish resolution, paraphrases, and unrelated text', () => {
+  for (const record of uncertaintyCases) {
+    assert.deepEqual(analyze(record).map(finding => finding.constructId).sort(), [...record.expected].sort(), record.id);
+  }
+});
+test('a resolved first mention does not hide later uncertainty or contaminate its evidence', () => {
+  const record = uncertaintyCases.find(record => record.id === 'resolved-then-new');
+  const finding = analyze(record).find(finding => finding.constructId === 'uncertainty');
+  assert.deepEqual(finding.excerpts.map(item => item.excerpt), ['I am unsure about billing.']);
+  assert.equal(summarize([record]).counts.find(item => item.id === 'uncertainty').count, 1);
+});
