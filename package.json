@@ -6,8 +6,9 @@
     "start": "node apps/web/server.js",
     "test": "node --test tests/*.test.js",
     "evaluate": "node scripts/evaluate.js",
-    "check": "node --check apps/web/app.js && node --check apps/web/analysis.js && node --check apps/web/reviews.js && node --check apps/web/server.js"
+    "check": "node --check apps/web/app.js && node --check apps/web/analysis.js && node --check apps/web/reviews.js && node --check apps/web/server.js && node --check apps/web/imports.js && node --check scripts/evaluate.js"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20.11"
+  }
 }
-

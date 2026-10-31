@@ -1,49 +1,34 @@
-# Evaluation
+# How I check the rules
 
-## Engineering checks
+Run `npm test` to check quotes, saved reviews, counts, dates, and imports. Run `npm run check` to check the JavaScript files.
 
-Run `npm test` to check evidence spans, abstention, record counts, experiment plans, and import validation. Run `npm run check` to check JavaScript syntax.
+## Read the results
 
-Every evidence span must point to the original text. Several phrase matches in the same interview should contribute only one count per construct. An unrelated sentence should produce no interpretation. Evidence excerpts stop at the nearest period, question mark, or exclamation mark; abbreviations and multilingual segmentation still need evaluation. Import dates must be real calendar dates, including leap-day rules.
+Run `npm run evaluate` for a table of results from 38 examples. Run `node scripts/evaluate.js --json` to get the same results as JSON. [The current table](evaluation-readout.md) is saved here too.
 
-## Construct regression readout
+I wrote these examples while building the rules. They cover all six themes, different wording, overlapping themes, and conversations where the app should return nothing. Four examples still miss a theme. These cases show where the rules need work; they are not an independent accuracy study.
 
-Run `npm run evaluate` to regenerate a Markdown readout from the 38 authored cases in `data/evaluation/construct-cases.json`. Each case has a synthetic consumer-assistant utterance, an expected set of labels, and a use-case slice. The script evaluates each record against all six constructs and reports true positives, false positives, false negatives, true negatives, precision, and recall per construct. A denominator of zero is shown as undefined, never as 100%. It also counts abstentions and names mismatched cases so a reviewer can inspect them. The test suite checks the arithmetic and rejects duplicate IDs or labels.
+For each theme, the table counts correct matches, wrong matches, missed matches, and correct skips. Precision asks: of the matches returned, how many were expected? Recall asks: of the expected matches, how many did we find? A dash means there was no denominator. The [scikit-learn reference](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html) explains the same formulas.
 
-The case set deliberately includes positives, no-signal examples, overlapping labels, resolved uncertainty, and paraphrases outside the current rules. The last group remains visible as misses; a high score on examples authored during development would be misleading. The two narrow additions for “too many clicks” and “can't tell which” came from this analysis. Other paraphrases remain open research questions. There is no threshold here that makes the system ready for consequential use.
+One conversation can match more than one theme. It counts once per theme. The report also lists every mismatch so I can read the example before changing a rule.
 
-The evaluation unit is a conversation record × construct, not a person. For a given construct, precision is TP/(TP+FP), recall is TP/(TP+FN), and abstention is the number of records with no predicted labels. “Correct abstention” uses records expected to have no labels. These definitions follow the standard classification metric convention; the report is intentionally descriptive and does not calculate uncertainty intervals on this small authored set. See [scikit-learn's metric reference](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html) for the formulas.
+## Save a review
 
-## What to evaluate next
+Open Evidence Explorer or a conversation. Choose Supported, Not supported, or Uncertain, add a note, and save. Reviews stay in this browser and can be exported.
 
-The phrase rules need a broader set of independently reviewed examples. Useful cases include paraphrases, negation, ambiguous language, and interviews with no clear signal. Reviewers should code whether the excerpt supports the label and whether a different explanation is more plausible.
+A review belongs to the exact source text and quoted sentences. If either changes, the app asks for a fresh review. Review decisions do not change the phrase counts.
 
-Split future evaluation data by person before tuning the rules, so follow-ups from the same person do not appear on both sides. Report precision, recall, abstention, and reviewer disagreement by construct.
+## Mistakes these checks caught
 
-## Measuring a product change
+- “Not unsure” was treated like active uncertainty.
+- “I don't know where to start” was missed.
+- Curly apostrophes in “wasn’t sure” caused missed matches.
+- An import could change the visible records even when saving failed.
 
-The experiment plans describe work to run next. For the study onboarding example, assign eligible new users at random, define quiz completion before starting, and inspect repeat study use and appropriate verification alongside the primary outcome. Interview themes help select that test; product events would supply its results.
+The tests keep those cases from breaking again. The app still has trouble with quoted speech, sarcasm, some negation, and wording outside its phrase list.
 
+## What needs to happen next
 
-## Evidence review workflow
+Have other people review a separate set of interviews before changing the rules. Keep each person's interviews together when splitting development and test data, so their follow-ups do not appear in both sets. Record where reviewers disagree and why. [Oortwijn and colleagues (2021)](https://aclanthology.org/2021.humeval-1.15/) describe a process for working through those disagreements.
 
-In Evidence Explorer or a conversation drawer, choose Supported, Not supported, or Uncertain and record reasoning or a follow-up question. Save the review, then filter the evidence list by status. The review remains visible after reload and is included in Export reviews. These judgments do not alter machine cue counts or establish causal effects.
-
-Reviews bind to the exact source text, construct, and evidence spans. Reusing an import ID with changed text or changing the evidence requires a fresh review. Exports omit stale decisions. Tests cover save/reload, replacement, changed-source invalidation, source spans in exports, invalid storage, and storage failures.
-
-
-## Uncertainty regression cases
-
-`data/evaluation/uncertainty-cases.json` contains 14 authored examples covering explicit resolution, active uncertainty, two starting-task paraphrases, unrelated statements, substring matches, and mixed resolved/current mentions. Expected labels are developer-authored regression expectations, not independent reviewer judgments or a benchmark accuracy claim.
-
-The baseline incorrectly matched “not unsure” and “no longer uncertain,” missed “I don't know where to start,” and matched the substring in “uncertainty estimation.” Rules now exclude a narrow set of directly negated uncertainty adjectives, include the starting-task paraphrases, and inspect later occurrences after a resolved first mention. “Not sure” remains a signal. Cue counts still use one record per construct.
-
-This does not solve negation across clauses, quoted speech, sarcasm, double negation, or arbitrary paraphrases. An independent review set and disagreement reporting remain next steps before broader claims about precision or recall.
-
-## Reproducing a review
-
-The authored suite now contains 38 records. Run `node scripts/evaluate.js --json` for machine-readable counts and mismatches, or `npm run evaluate` for Markdown. GitHub CI runs both commands and saves the outputs in a `construct-evaluation` artifact attached to each workflow run. The artifact belongs to that run's commit, so a reviewer can compare results with the exact rule version under review. Known semantic misses do not fail CI; malformed fixtures and broken accounting do.
-
-Curly apostrophes previously caused false negatives for contractions such as “wasn’t sure” and “don’t know where.” Matching now substitutes apostrophes in a temporary string of identical length. Evidence is still copied from the untouched source. Cases include active uncertainty, resolved uncertainty, a resolved sentence followed by an active concern, and unrelated negative wording. This is typographic normalization; it does not resolve quoted speech or arbitrary negation scope.
-
-When comparing a future model with these rules, freeze the evaluation examples first and keep a separate development set. Have reviewers label the same records independently, record their rationale and disagreements, and resolve unclear instructions before collecting the next batch. [Oortwijn, Ossenkoppele, and Betti (2021)](https://aclanthology.org/2021.humeval-1.15/) describe a procedure for resolving annotation disagreements; that motivates the proposed review workflow, rather than validating these authored labels.
+GitHub CI saves the Markdown and JSON reports as a `construct-evaluation` artifact for each run. Each report belongs to that run's version of the code. Known wording misses stay visible without failing CI. Broken calculations or invalid examples fail the tests.

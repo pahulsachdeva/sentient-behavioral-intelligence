@@ -4,12 +4,12 @@
  * excerpt + hypothesis + alternative contract and be evaluated separately.
  */
 export const constructs = [
-  { id: 'effort', label: 'Cognitive effort', color: '#b99aff', cues: [/six screens/i, /which step/i, /checklist/i, /another tab/i, /one more thing/i, /takes time/i, /slow on busy/i, /too many clicks/i], description: 'Reported steps or attention required to use a workflow.', alternative: 'Available time or the choice of task may explain the friction.' },
-  { id: 'uncertainty', label: 'Uncertainty', color: '#e6ad7b', cues: [/wasn't sure/i, /\bnot sure\b/i, /\bunsure\b/i, /\buncertain\b/i, /\b(?:do not|don't|did not|didn't) know (?:how|where|which|what)\b/i, /\b(?:can't|cannot|can not) tell (?:which|how|whether)\b/i, /wonder if/i, /need to know/i, /unusual request/i, /edge cases/i], description: 'A stated information gap about what will happen or what to do.', alternative: 'The customer may need specific documentation rather than a new product flow.' },
-  { id: 'control', label: 'Perceived control', color: '#84c8bd', cues: [/keep my original/i, /review the draft/i, /compare them/i, /draft before/i, /see the edits/i, /step in/i, /test .* safely/i, /paid features/i], description: 'A stated desire to review, intervene, or control the process.', alternative: 'The user may prefer a different writing style or need clearer editing controls.' },
-  { id: 'trust', label: 'Trust calibration', color: '#a0aef9', cues: [/verify answers/i, /trust the drafts/i, /think it was broken/i, /real example/i, /seeing the draft/i, /safely/i], description: 'A reported signal of confidence or concern about reliability.', alternative: 'The concern may reflect a specific defect or lack of product information.' },
-  { id: 'habit', label: 'Existing routine', color: '#cf9bc9', cues: [/morning routine/i, /daily digest/i, /fits (?:my|our) routine/i, /most days/i, /another dashboard/i], description: 'A stated relationship between usage and an established routine.', alternative: 'The format preference may be driven by workload or channel access.' },
-  { id: 'expectation', label: 'Expectation gap', color: '#a4c595', cues: [/thought my writing chats/i, /instantly/i, /nobody explained/i, /delay/i, /sync status/i], description: 'A reported mismatch between expected and observed behavior.', alternative: 'A temporary sync issue may account for the experience.' }
+  { id: 'effort', label: 'Time and effort', color: '#b99aff', cues: [/six screens/i, /which step/i, /checklist/i, /another tab/i, /one more thing/i, /takes time/i, /slow on busy/i, /too many clicks/i], description: 'Steps, time, or attention needed to finish a task.', alternative: 'Available time or the choice of task may explain the friction.' },
+  { id: 'uncertainty', label: 'Uncertainty', color: '#e6ad7b', cues: [/wasn't sure/i, /\bnot sure\b/i, /\bunsure\b/i, /\buncertain\b/i, /\b(?:do not|don't|did not|didn't) know (?:how|where|which|what)\b/i, /\b(?:can't|cannot|can not) tell (?:which|how|whether)\b/i, /wonder if/i, /need to know/i, /unusual request/i, /edge cases/i], description: 'Something the person does not know or understand yet.', alternative: 'The customer may need specific documentation rather than a new product flow.' },
+  { id: 'control', label: 'Control over the result', color: '#84c8bd', cues: [/keep my original/i, /review the draft/i, /compare them/i, /draft before/i, /see the edits/i, /step in/i, /test .* safely/i, /paid features/i], description: 'Wanting to check or change what the assistant does.', alternative: 'The user may prefer a different writing style or need clearer editing controls.' },
+  { id: 'trust', label: 'Trust and checking', color: '#a0aef9', cues: [/verify answers/i, /trust the drafts/i, /think it was broken/i, /real example/i, /seeing the draft/i, /safely/i], description: 'How someone decides whether to trust or check an answer.', alternative: 'The concern may reflect a specific defect or lack of product information.' },
+  { id: 'habit', label: 'Daily habits', color: '#cf9bc9', cues: [/morning routine/i, /daily digest/i, /fits (?:my|our) routine/i, /most days/i, /another dashboard/i], description: "How the assistant fits into someone's routine.", alternative: 'The format preference may be driven by workload or channel access.' },
+  { id: 'expectation', label: 'Unexpected behavior', color: '#a4c595', cues: [/thought my writing chats/i, /instantly/i, /nobody explained/i, /delay/i, /sync status/i], description: 'When the product behaves differently from what someone expected.', alternative: 'A temporary sync issue may account for the experience.' }
 ];
 
 // Narrow exclusions for explicit resolution, not a general English negation parser.
@@ -41,7 +41,7 @@ export function analyze(record) {
     // Several rules may match the same sentence. Count that sentence once.
     const unique = [...new Map(matches.map(m => [m.excerpt, m])).values()];
     if (!unique.length) return [];
-    return [{ id: `${record.id}-${construct.id}`, recordId: record.id, constructId: construct.id, label: construct.label, color: construct.color, excerpts: unique, hypothesis: `This conversation may indicate ${construct.label.toLowerCase()} as an adoption factor.`, alternative: construct.alternative, evidenceLevel: unique.length > 1 ? 'Multiple cues' : 'Single cue', status: 'Needs human review' }];
+    return [{ id: `${record.id}-${construct.id}`, recordId: record.id, constructId: construct.id, label: construct.label, color: construct.color, excerpts: unique, hypothesis: `This may be worth asking about: ${construct.label.toLowerCase()}.`, alternative: construct.alternative, evidenceLevel: unique.length > 1 ? 'Multiple cues' : 'Single cue', status: 'Needs human review' }];
   });
 }
 
@@ -94,7 +94,7 @@ export const experimentTemplates = {
 
 export function recommendations(records) {
   const { findings, counts } = summarize(records);
-  return counts.filter(c => c.count).sort((a, b) => b.count - a.count).map(c => ({ ...c, ...experimentTemplates[c.id], evidence: findings.filter(f => f.constructId === c.id).slice(0, 3), hypothesis: `If ${c.label.toLowerCase()} is a barrier for this audience, the proposed change may improve the stated outcome. This remains untested.` }));
+  return counts.filter(c => c.count).sort((a, b) => b.count - a.count).map(c => ({ ...c, ...experimentTemplates[c.id], evidence: findings.filter(f => f.constructId === c.id).slice(0, 3), hypothesis: `This idea comes from conversations about ${c.label.toLowerCase()}. We still need to test whether it helps.` }));
 }
 
 /** Reject rollover dates such as February 30 while preserving YYYY-MM-DD input. */

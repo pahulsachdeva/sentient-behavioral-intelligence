@@ -27,7 +27,7 @@ test('every experiment has a supported cue and no fabricated outcome', () => {
   for (const idea of recommendations(records)) {
     assert.ok(idea.evidence.length);
     assert.ok(idea.design.includes('Randomiz') || idea.design.includes('randomiz') || idea.design.includes('Assign'));
-    assert.match(idea.hypothesis, /untested/);
+    assert.match(idea.hypothesis, /need to test/);
   }
 });
 test('import validation rejects malformed, duplicate, and oversize input', () => {

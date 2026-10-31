@@ -46,14 +46,14 @@ function formatRate(value) { return value === null ? '—' : `${(value * 100).to
 
 export function markdown(report) {
   const lines = [
-    `# Authored construct regression evaluation (${report.cases} cases)`, '',
-    'These examples were written alongside the rules. They are regression probes, not a held-out benchmark or an estimate of field performance.', '',
-    '| Construct | TP | FP | FN | TN | Precision | Recall |', '|---|---:|---:|---:|---:|---:|---:|',
+    `# Phrase rule checks (${report.cases} cases)`, '',
+    'I wrote these examples while building the rules. Use them to find mistakes. The scores do not show how well the app works on real interviews.', '',
+    '| Theme | Correct matches | Wrong matches | Missed matches | Correct skips | Precision | Recall |', '|---|---:|---:|---:|---:|---:|---:|',
     ...report.byLabel.map(row => `| ${row.label} | ${row.tp} | ${row.fp} | ${row.fn} | ${row.tn} | ${formatRate(row.precision)} | ${formatRate(row.recall)} |`), '',
-    `Abstained on ${report.abstention.predicted}/${report.cases} records; correctly abstained on ${report.abstention.correct}/${report.abstention.eligible} records expected to have no label.`, '',
+    `Returned no theme for ${report.abstention.predicted}/${report.cases} conversations. Of the ${report.abstention.eligible} examples expected to have no theme, it correctly skipped ${report.abstention.correct}.`, '',
     '## Cases to investigate', ''
   ];
-  lines.push(...(report.errors.length ? report.errors.map(row => `- **${row.id}** (${row.slice}): missing ${row.missing.join(', ') || 'none'}; unexpected ${row.unexpected.join(', ') || 'none'}.`) : ['No mismatches in this authored set.']));
+  lines.push(...(report.errors.length ? report.errors.map(row => `- **${row.id}** (${row.slice}): missing ${row.missing.join(', ') || 'none'}; unexpected ${row.unexpected.join(', ') || 'none'}.`) : ['All examples matched their expected labels.']));
   return lines.join('\n') + '\n';
 }
 

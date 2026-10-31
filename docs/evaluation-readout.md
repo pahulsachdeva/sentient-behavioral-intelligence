@@ -1,8 +1,8 @@
-# Authored construct regression evaluation (38 cases)
+# Phrase rule checks (38 cases)
 
-These examples were written alongside the rules. They are regression probes, not a held-out benchmark or an estimate of field performance.
+I wrote these examples while building the rules. Use them to find mistakes. The scores do not show how well the app works on real interviews.
 
-| Construct | TP | FP | FN | TN | Precision | Recall |
+| Theme | Correct matches | Wrong matches | Missed matches | Correct skips | Precision | Recall |
 |---|---:|---:|---:|---:|---:|---:|
 | effort | 5 | 0 | 0 | 33 | 100.0% | 100.0% |
 | uncertainty | 10 | 0 | 0 | 28 | 100.0% | 100.0% |
@@ -11,7 +11,7 @@ These examples were written alongside the rules. They are regression probes, not
 | habit | 2 | 0 | 1 | 35 | 100.0% | 66.7% |
 | expectation | 2 | 0 | 1 | 35 | 100.0% | 66.7% |
 
-Abstained on 15/38 records; correctly abstained on 11/11 records expected to have no label.
+Returned no theme for 15/38 conversations. Of the 11 examples expected to have no theme, it correctly skipped 11.
 
 ## Cases to investigate
 
