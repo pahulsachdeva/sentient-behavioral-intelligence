@@ -1,0 +1,66 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { analyze, constructs } from '../apps/web/analysis.js';
+
+export const fixturePath = new URL('../data/evaluation/construct-cases.json', import.meta.url);
+
+export function evaluate(cases, labels = constructs.map(item => item.id)) {
+  const ids = new Set();
+  const allowed = new Set(labels);
+  const known = new Set(constructs.map(item => item.id));
+  if (labels.some(label => !known.has(label))) throw new Error('Unknown evaluation label.');
+  if (!Array.isArray(cases) || !cases.length || !labels.length || allowed.size !== labels.length) {
+    throw new Error('Provide nonempty cases and unique labels.');
+  }
+  const rows = cases.map(item => {
+    if (!item || typeof item.id !== 'string' || !item.id || ids.has(item.id) || typeof item.text !== 'string' || !Array.isArray(item.expected)) {
+      throw new Error(`Invalid or duplicate evaluation case: ${item?.id ?? '(missing id)'}`);
+    }
+    ids.add(item.id);
+    if (new Set(item.expected).size !== item.expected.length || item.expected.some(label => !allowed.has(label))) {
+      throw new Error(`Unknown or duplicate expected label in ${item.id}`);
+    }
+    const predicted = analyze(item).map(finding => finding.constructId);
+    return { id: item.id, slice: item.slice ?? 'unspecified', expected: item.expected, predicted,
+      missing: item.expected.filter(label => !predicted.includes(label)),
+      unexpected: predicted.filter(label => !item.expected.includes(label)) };
+  });
+
+  const byLabel = labels.map(label => {
+    const tp = rows.filter(row => row.expected.includes(label) && row.predicted.includes(label)).length;
+    const fp = rows.filter(row => !row.expected.includes(label) && row.predicted.includes(label)).length;
+    const fn = rows.filter(row => row.expected.includes(label) && !row.predicted.includes(label)).length;
+    const tn = rows.length - tp - fp - fn;
+    return { label, tp, fp, fn, tn, precision: tp + fp ? tp / (tp + fp) : null,
+      recall: tp + fn ? tp / (tp + fn) : null };
+  });
+  const negatives = rows.filter(row => !row.expected.length);
+  return { cases: rows.length, byLabel,
+    abstention: { predicted: rows.filter(row => !row.predicted.length).length,
+      correct: negatives.filter(row => !row.predicted.length).length, eligible: negatives.length },
+    errors: rows.filter(row => row.missing.length || row.unexpected.length) };
+}
+
+function formatRate(value) { return value === null ? '—' : `${(value * 100).toFixed(1)}%`; }
+
+export function markdown(report) {
+  const lines = [
+    `# Phrase rule checks (${report.cases} cases)`, '',
+    'I wrote these examples while building the rules. Use them to find mistakes. The scores do not show how well the app works on real interviews.', '',
+    '| Theme | Correct matches | Wrong matches | Missed matches | Correct skips | Precision | Recall |', '|---|---:|---:|---:|---:|---:|---:|',
+    ...report.byLabel.map(row => `| ${row.label} | ${row.tp} | ${row.fp} | ${row.fn} | ${row.tn} | ${formatRate(row.precision)} | ${formatRate(row.recall)} |`), '',
+    `Returned no theme for ${report.abstention.predicted}/${report.cases} conversations. Of the ${report.abstention.eligible} examples expected to have no theme, it correctly skipped ${report.abstention.correct}.`, '',
+    '## Cases to investigate', ''
+  ];
+  lines.push(...(report.errors.length ? report.errors.map(row => `- **${row.id}** (${row.slice}): missing ${row.missing.join(', ') || 'none'}; unexpected ${row.unexpected.join(', ') || 'none'}.`) : ['All examples matched their expected labels.']));
+  return lines.join('\n') + '\n';
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const args = process.argv.slice(2);
+  if (args.some(arg => arg !== '--json')) throw new Error('Usage: node scripts/evaluate.js [--json]');
+  const cases = JSON.parse(readFileSync(fixturePath, 'utf8'));
+  const report = evaluate(cases);
+  process.stdout.write(args.includes('--json') ? JSON.stringify(report, null, 2) + '\n' : markdown(report));
+}

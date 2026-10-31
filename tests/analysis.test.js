@@ -27,7 +27,7 @@ test('every experiment has a supported cue and no fabricated outcome', () => {
   for (const idea of recommendations(records)) {
     assert.ok(idea.evidence.length);
     assert.ok(idea.design.includes('Randomiz') || idea.design.includes('randomiz') || idea.design.includes('Assign'));
-    assert.match(idea.hypothesis, /untested/);
+    assert.match(idea.hypothesis, /need to test/);
   }
 });
 test('import validation rejects malformed, duplicate, and oversize input', () => {
@@ -66,4 +66,16 @@ test('a resolved first mention does not hide later uncertainty or contaminate it
   const finding = analyze(record).find(finding => finding.constructId === 'uncertainty');
   assert.deepEqual(finding.excerpts.map(item => item.excerpt), ['I am unsure about billing.']);
   assert.equal(summarize([record]).counts.find(item => item.id === 'uncertainty').count, 1);
+});
+
+test('typographic apostrophes preserve original evidence and resolution behavior', () => {
+  const record = { id: 'unicode', text: 'I wasn’t unsure about setup. I don’t know where to find billing.' };
+  const findings = analyze(record);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].excerpts.length, 1);
+  assert.equal(findings[0].excerpts[0].excerpt, 'I don’t know where to find billing.');
+  for (const span of findings[0].excerpts) assert.equal(record.text.slice(span.start, span.end).trim(), span.excerpt);
+  for (const item of ["I wasn't sure.", 'I wasn’t sure.', 'I wasn‘t sure.']) {
+    assert.deepEqual(analyze({ id: 'same', text: item }).map(f => f.constructId), ['uncertainty']);
+  }
 });

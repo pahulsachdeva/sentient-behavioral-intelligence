@@ -12,3 +12,12 @@ jobs:
           node-version: '22'
       - run: npm run check
       - run: npm test
+      - name: Generate evaluation readouts
+        run: |
+          mkdir -p evaluation-output
+          node scripts/evaluate.js > evaluation-output/report.md
+          node scripts/evaluate.js --json > evaluation-output/report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: construct-evaluation
+          path: evaluation-output/
