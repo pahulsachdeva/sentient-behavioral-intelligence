@@ -6,6 +6,14 @@ Run `npm test` to check evidence spans, abstention, record counts, experiment pl
 
 Every evidence span must point to the original text. Several phrase matches in the same interview should contribute only one count per construct. An unrelated sentence should produce no interpretation. Evidence excerpts stop at the nearest period, question mark, or exclamation mark; abbreviations and multilingual segmentation still need evaluation. Import dates must be real calendar dates, including leap-day rules.
 
+## Construct regression readout
+
+Run `npm run evaluate` to regenerate a Markdown readout from the 30 authored cases in `data/evaluation/construct-cases.json`. Each case has a synthetic consumer-assistant utterance, an expected set of labels, and a use-case slice. The script evaluates each record against all six constructs and reports true positives, false positives, false negatives, true negatives, precision, and recall per construct. A denominator of zero is shown as undefined, never as 100%. It also counts abstentions and names mismatched cases so a reviewer can inspect them. The test suite checks the arithmetic and rejects duplicate IDs or labels.
+
+The case set deliberately includes positives, no-signal examples, overlapping labels, resolved uncertainty, and paraphrases outside the current rules. The last group remains visible as misses; a high score on examples authored during development would be misleading. The two narrow additions for “too many clicks” and “can't tell which” came from this analysis. Other paraphrases remain open research questions. There is no threshold here that makes the system ready for consequential use.
+
+The evaluation unit is a conversation record × construct, not a person. For a given construct, precision is TP/(TP+FP), recall is TP/(TP+FN), and abstention is the number of records with no predicted labels. “Correct abstention” uses records expected to have no labels. These definitions follow the standard classification metric convention; the report is intentionally descriptive and does not calculate uncertainty intervals on this small authored set. See [scikit-learn's metric reference](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html) for the formulas.
+
 ## What to evaluate next
 
 The phrase rules need a broader set of independently reviewed examples. Useful cases include paraphrases, negation, ambiguous language, and interviews with no clear signal. Reviewers should code whether the excerpt supports the label and whether a different explanation is more plausible.

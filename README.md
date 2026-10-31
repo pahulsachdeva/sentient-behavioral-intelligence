@@ -84,6 +84,7 @@ npm start
 ```bash
 npm run check
 npm test
+npm run evaluate # Authored construct cases, per-label errors, and abstention
 ```
 
 To import examples, use an array with `id`, `account` (the person's name or ID), `role` (their use case), `date`, and `text`. `channel` and `stage` are optional.
