@@ -8,7 +8,7 @@ const cases = JSON.parse(readFileSync(fixturePath, 'utf8'));
 
 test('evaluation accounts for each record once per construct and exposes misses', () => {
   const result = evaluate(cases);
-  assert.equal(result.cases, 30);
+  assert.equal(result.cases, cases.length);
   assert.deepEqual(result.byLabel.map(row => row.label), constructs.map(item => item.id));
   for (const row of result.byLabel) {
     assert.equal(row.tp + row.fp + row.fn + row.tn, result.cases);
@@ -38,4 +38,17 @@ test('new phrase cues retain source spans and avoid incidental substrings', () =
   const result = evaluate([{ id: 'phrases', text, expected: ['effort', 'uncertainty'] }]);
   assert.equal(result.errors.length, 0);
   assert.deepEqual(evaluate([{ id: 'neutral', text: 'The clicks report helps us tell which team owns it.', expected: [] }]).errors, []);
+});
+
+test('false positives and false negatives use distinct denominators', () => {
+  const result = evaluate([
+    { id: 'tp', text: 'It takes time.', expected: ['effort'] },
+    { id: 'fp', text: 'It takes time.', expected: [] },
+    { id: 'fn', text: 'Too much work.', expected: ['effort'] },
+    { id: 'tn', text: 'We met.', expected: [] }
+  ]);
+  const row = result.byLabel.find(item => item.label === 'effort');
+  assert.deepEqual(row, { label: 'effort', tp: 1, fp: 1, fn: 1, tn: 1, precision: 0.5, recall: 0.5 });
+  assert.equal(result.errors.length, 2);
+  assert.throws(() => evaluate(cases, ['made-up']), /Unknown/);
 });

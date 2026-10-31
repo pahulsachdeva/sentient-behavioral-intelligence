@@ -67,3 +67,15 @@ test('a resolved first mention does not hide later uncertainty or contaminate it
   assert.deepEqual(finding.excerpts.map(item => item.excerpt), ['I am unsure about billing.']);
   assert.equal(summarize([record]).counts.find(item => item.id === 'uncertainty').count, 1);
 });
+
+test('typographic apostrophes preserve original evidence and resolution behavior', () => {
+  const record = { id: 'unicode', text: 'I wasn’t unsure about setup. I don’t know where to find billing.' };
+  const findings = analyze(record);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].excerpts.length, 1);
+  assert.equal(findings[0].excerpts[0].excerpt, 'I don’t know where to find billing.');
+  for (const span of findings[0].excerpts) assert.equal(record.text.slice(span.start, span.end).trim(), span.excerpt);
+  for (const item of ["I wasn't sure.", 'I wasn’t sure.', 'I wasn‘t sure.']) {
+    assert.deepEqual(analyze({ id: 'same', text: item }).map(f => f.constructId), ['uncertainty']);
+  }
+});

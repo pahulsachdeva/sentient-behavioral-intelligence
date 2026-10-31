@@ -70,7 +70,7 @@ I started with rules because I want to understand and inspect the behavior befor
 
 The app runs in the browser, with a small Node server for local development. Imports stay in that browser's storage and can be cleared from Research Workspace.
 
-[Development notes](docs/development-notes.md) · [Architecture](docs/architecture.md) · [Methodology](docs/methodology.md) · [Evaluation](docs/evaluation.md)
+[Development notes](docs/development-notes.md) · [Architecture](docs/architecture.md) · [Methodology](docs/methodology.md) · [Evaluation](docs/evaluation.md) · [Current evaluation readout](docs/evaluation-readout.md)
 
 ## Run locally
 

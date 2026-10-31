@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { analyze, constructs } from '../apps/web/analysis.js';
 
@@ -7,6 +8,8 @@ export const fixturePath = new URL('../data/evaluation/construct-cases.json', im
 export function evaluate(cases, labels = constructs.map(item => item.id)) {
   const ids = new Set();
   const allowed = new Set(labels);
+  const known = new Set(constructs.map(item => item.id));
+  if (labels.some(label => !known.has(label))) throw new Error('Unknown evaluation label.');
   if (!Array.isArray(cases) || !cases.length || !labels.length || allowed.size !== labels.length) {
     throw new Error('Provide nonempty cases and unique labels.');
   }
@@ -54,7 +57,10 @@ export function markdown(report) {
   return lines.join('\n') + '\n';
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === fileURLToPath(new URL(`file://${process.argv[1]}`))) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const args = process.argv.slice(2);
+  if (args.some(arg => arg !== '--json')) throw new Error('Usage: node scripts/evaluate.js [--json]');
   const cases = JSON.parse(readFileSync(fixturePath, 'utf8'));
-  process.stdout.write(markdown(evaluate(cases)));
+  const report = evaluate(cases);
+  process.stdout.write(args.includes('--json') ? JSON.stringify(report, null, 2) + '\n' : markdown(report));
 }

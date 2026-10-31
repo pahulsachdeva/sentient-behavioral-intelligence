@@ -8,7 +8,7 @@ Every evidence span must point to the original text. Several phrase matches in t
 
 ## Construct regression readout
 
-Run `npm run evaluate` to regenerate a Markdown readout from the 30 authored cases in `data/evaluation/construct-cases.json`. Each case has a synthetic consumer-assistant utterance, an expected set of labels, and a use-case slice. The script evaluates each record against all six constructs and reports true positives, false positives, false negatives, true negatives, precision, and recall per construct. A denominator of zero is shown as undefined, never as 100%. It also counts abstentions and names mismatched cases so a reviewer can inspect them. The test suite checks the arithmetic and rejects duplicate IDs or labels.
+Run `npm run evaluate` to regenerate a Markdown readout from the 38 authored cases in `data/evaluation/construct-cases.json`. Each case has a synthetic consumer-assistant utterance, an expected set of labels, and a use-case slice. The script evaluates each record against all six constructs and reports true positives, false positives, false negatives, true negatives, precision, and recall per construct. A denominator of zero is shown as undefined, never as 100%. It also counts abstentions and names mismatched cases so a reviewer can inspect them. The test suite checks the arithmetic and rejects duplicate IDs or labels.
 
 The case set deliberately includes positives, no-signal examples, overlapping labels, resolved uncertainty, and paraphrases outside the current rules. The last group remains visible as misses; a high score on examples authored during development would be misleading. The two narrow additions for “too many clicks” and “can't tell which” came from this analysis. Other paraphrases remain open research questions. There is no threshold here that makes the system ready for consequential use.
 
@@ -39,3 +39,11 @@ Reviews bind to the exact source text, construct, and evidence spans. Reusing an
 The baseline incorrectly matched “not unsure” and “no longer uncertain,” missed “I don't know where to start,” and matched the substring in “uncertainty estimation.” Rules now exclude a narrow set of directly negated uncertainty adjectives, include the starting-task paraphrases, and inspect later occurrences after a resolved first mention. “Not sure” remains a signal. Cue counts still use one record per construct.
 
 This does not solve negation across clauses, quoted speech, sarcasm, double negation, or arbitrary paraphrases. An independent review set and disagreement reporting remain next steps before broader claims about precision or recall.
+
+## Reproducing a review
+
+The authored suite now contains 38 records. Run `node scripts/evaluate.js --json` for machine-readable counts and mismatches, or `npm run evaluate` for Markdown. GitHub CI runs both commands and saves the outputs in a `construct-evaluation` artifact attached to each workflow run. The artifact belongs to that run's commit, so a reviewer can compare results with the exact rule version under review. Known semantic misses do not fail CI; malformed fixtures and broken accounting do.
+
+Curly apostrophes previously caused false negatives for contractions such as “wasn’t sure” and “don’t know where.” Matching now substitutes apostrophes in a temporary string of identical length. Evidence is still copied from the untouched source. Cases include active uncertainty, resolved uncertainty, a resolved sentence followed by an active concern, and unrelated negative wording. This is typographic normalization; it does not resolve quoted speech or arbitrary negation scope.
+
+When comparing a future model with these rules, freeze the evaluation examples first and keep a separate development set. Have reviewers label the same records independently, record their rationale and disagreements, and resolve unclear instructions before collecting the next batch. [Oortwijn, Ossenkoppele, and Betti (2021)](https://aclanthology.org/2021.humeval-1.15/) describe a procedure for resolving annotation disagreements; that motivates the proposed review workflow, rather than validating these authored labels.

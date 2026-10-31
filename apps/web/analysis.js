@@ -23,10 +23,12 @@ function explicitlyResolved(text, match) {
 /** A record contributes at most one finding per construct. No cue means abstention. */
 export function analyze(record) {
   const text = String(record.text || '');
+  // Single-code-unit replacement preserves every source offset.
+  const matchingText = text.replace(/[‘’]/g, "'");
   return constructs.flatMap(construct => {
     const matches = construct.cues.flatMap(pattern => {
       // Inspect every occurrence: a resolved first mention must not hide a later concern.
-      const occurrences = text.matchAll(new RegExp(pattern.source, pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g'));
+      const occurrences = matchingText.matchAll(new RegExp(pattern.source, pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g'));
       return [...occurrences].filter(match => !(construct.id === 'uncertainty' && explicitlyResolved(text, match))).map(match => {
         // Simple punctuation boundaries; abbreviations and multilingual segmentation need separate evaluation.
         const previousBoundary = Math.max(...['.', '!', '?'].map(mark => text.lastIndexOf(mark, match.index - 1)));
